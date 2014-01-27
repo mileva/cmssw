@@ -18,9 +18,6 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "Geometry/Records/interface/MuonGeometryRecord.h"
-#include "DataFormats/Common/interface/Handle.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
@@ -34,6 +31,11 @@
 #include "DataFormats/MuonDetId/interface/RPCDetId.h"
 #include "CondFormats/RPCObjects/interface/RPCStripNoises.h"
 #include "CondFormats/DataRecord/interface/RPCStripNoisesRcd.h"
+
+#include "Geometry/RPCGeometry/interface/RPCRoll.h"
+#include "Geometry/RPCGeometry/interface/RPCChamber.h"
+#include "Geometry/RPCGeometry/interface/RPCGeometry.h"
+#include "Geometry/RPCGeometry/interface/RPCGeomServ.h"
 
 #include <cmath>
 #include <math.h>
@@ -70,8 +72,10 @@ void RPCDBPerformanceHandler::getNewObjects(){
   RPCStripNoises* obj = new RPCStripNoises();
 
   std::map< int, std::vector<double> >::iterator itc;
-  for(itc = (theRPCSimSetUp->_clsMap).begin();itc != (theRPCSimSetUp->_clsMap).end();++itc){
-    for(unsigned int n = 0; n < (itc->second).size();++n){
+  for(itc = (theRPCSimSetUp->_clsMap).begin();itc != (theRPCSimSetUp->_clsMap).end();++itc)
+  {
+    for(unsigned int n = 0; n < (itc->second).size();++n)
+    {
       (obj->v_cls).push_back((itc->second)[n]);
     }
   }
@@ -79,16 +83,32 @@ void RPCDBPerformanceHandler::getNewObjects(){
   RPCStripNoises::NoiseItem tipoprova;
 
   int i = 0;
-  for(std::map<uint32_t, std::vector<float> >::iterator it = (theRPCSimSetUp->_mapDetIdNoise).begin(); 
-      it != (theRPCSimSetUp->_mapDetIdNoise).end(); it++){
-
+  std::cout << "size of _mapDetIdNoise = " << (theRPCSimSetUp->_mapDetIdNoise).size() << std::endl;
+  for(std::map<uint32_t, float>::iterator it = (theRPCSimSetUp->_mapDetIdNoise).begin(); 
+      it != (theRPCSimSetUp->_mapDetIdNoise).end(); it++)
+  {
     tipoprova.dpid = it->first;
+
+//    std::cout << "dpid = " << tipoprova.dpid << std::endl;
+    RPCDetId rpcid(tipoprova.dpid);
+//    std::cout << "RPCDetId = " << rpcid << std::endl;
+
+//    std::vector<RPCRoll*>  rpcRolls = theGeometry->rolls();
+
+   const RPCRoll* roll = dynamic_cast<const RPCRoll* >(theGeometry->roll(rpcid));
+   unsigned int numbStrips = roll->nstrips();
+//   std::cout << "strip number = " << roll->nstrips() << std::endl;
+//   std::cout << "------------------------" << std::endl;
+
+
     tipoprova.time =  theRPCSimSetUp->getTime(it->first);
 
-    for(unsigned int k = 0; k < 96; ++k){
-
-      tipoprova.noise = ((it->second))[k];
-      tipoprova.eff = (theRPCSimSetUp->getEff(it->first))[k];
+    for(unsigned int k = 0; k < numbStrips; ++k)
+    {
+//      tipoprova.noise = 0.05;
+//      tipoprova.eff = 0.95;
+      tipoprova.noise = ((it->second));
+      tipoprova.eff = (theRPCSimSetUp->getEff(it->first));
       (obj->v_noises).push_back(tipoprova);
     }
     
@@ -105,8 +125,3 @@ void RPCDBPerformanceHandler::getNewObjects(){
 std::string RPCDBPerformanceHandler::id() const {
   return dataTag;
 }
-
-
-
-
-

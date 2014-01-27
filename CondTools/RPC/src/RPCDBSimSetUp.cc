@@ -22,83 +22,36 @@ RPCDBSimSetUp::RPCDBSimSetUp(const edm::ParameterSet& ps) {
   _bxmap.clear();
 
     //------------------------ Noise Reading ----------------------------
-    
   edm::FileInPath fp1 = ps.getParameter<edm::FileInPath>("noisemapfile");
-  std::ifstream _infile1(fp1.fullPath().c_str(), std::ios::in);
-  
-  std::vector<float>  vnoise;
+  _infile1 = new ifstream(fp1.fullPath().c_str(), std::ios::in);
 
   int rpcdetid = 0;
-  std::string buff;
-  
-  std::vector< std::string > words;
+  float noiseValue = 0.;
 
-  int count = 0;
-  while( getline(_infile1, buff, '\n') ){
-    
-    words.clear();
-    vnoise.clear();
-    
-    stringstream ss;
-    std::string chname;
-    ss<<buff;
-    ss>>chname>>rpcdetid;
-
-    std::string::size_type pos = 0, prev_pos = 0;
-
-    while ( (pos = buff.find("  ",pos)) != string::npos){
-      
-      words.push_back(buff.substr(prev_pos, pos - prev_pos));
-      prev_pos = ++pos;
-    }
-    words.push_back(buff.substr(prev_pos, pos - prev_pos));
-    
-    for(unsigned int i = 2; i < words.size(); ++i){
-      float value = atof( ((words)[i]).c_str() );
-      vnoise.push_back(value);
-    }
-    
-    _mapDetIdNoise.insert(make_pair(static_cast<uint32_t>(rpcdetid),vnoise));
-    
-    count++;
+  while(!_infile1->eof())
+  {
+    *_infile1 >> rpcdetid >> noiseValue;
+    _mapDetIdNoise[rpcdetid] = noiseValue;
   }
-   _infile1.close();
-
+  _infile1->close();
+    
 
   //------------------------ Eff Reading ----------------------------
-  
+
   edm::FileInPath fp2 = ps.getParameter<edm::FileInPath>("effmapfile");
   _infile2 = new ifstream(fp2.fullPath().c_str(), std::ios::in);
-  
-  std::vector<float> veff ;
+
   rpcdetid = 0;
-  
-  while( getline(*_infile2, buff, '\n') ){
-    
-    words.clear();
-    veff.clear();
-    
-    stringstream ss;
-    std::string chname;
-    ss<<buff;
-    ss>>chname>>rpcdetid;
-    
-    std::string::size_type pos = 0, prev_pos = 0;
-    while ( (pos = buff.find("  ",pos)) != string::npos){
-      
-      words.push_back(buff.substr(prev_pos, pos - prev_pos));
-      prev_pos = ++pos;
-    }
-    words.push_back(buff.substr(prev_pos, pos - prev_pos));
-    
-    for(unsigned int i = 2; i < words.size(); ++i){
-      float value = atof(((words)[i]).c_str());
-      veff.push_back(value);
-    }
-    _mapDetIdEff.insert(make_pair(static_cast<uint32_t>(rpcdetid),veff));
+  float effic = 0.;
+
+  while(!_infile2->eof())
+  {
+    *_infile2 >> rpcdetid >> effic;
+    _mapDetIdEff[rpcdetid] = effic;
   }
   _infile2->close();
 
+  
   //---------------------- Timing reading ------------------------------------
 
   edm::FileInPath fp3 = ps.getParameter<edm::FileInPath>("timingMap");
@@ -140,15 +93,15 @@ RPCDBSimSetUp::RPCDBSimSetUp(const edm::ParameterSet& ps) {
   _infile4->close();
 }
 
-std::vector<float> RPCDBSimSetUp::getNoise(uint32_t id)
+float RPCDBSimSetUp::getNoise(uint32_t id)
 {
-  map<uint32_t,std::vector<float> >::iterator iter = _mapDetIdNoise.find(id);
+  map<uint32_t, float>::iterator iter = _mapDetIdNoise.find(id);
   return (iter->second);
 }
 
-std::vector<float> RPCDBSimSetUp::getEff(uint32_t id)
+float RPCDBSimSetUp::getEff(uint32_t id)
 {
-  map<uint32_t,std::vector<float> >::iterator iter = _mapDetIdEff.find(id);
+  map<uint32_t, float>::iterator iter = _mapDetIdEff.find(id);
   return iter->second;
 }
 

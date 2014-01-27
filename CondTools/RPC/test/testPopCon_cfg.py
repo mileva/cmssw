@@ -12,7 +12,7 @@ process.load('Configuration.Geometry.GeometryExtended2023RPCEta2UpscopeReco_cff'
 #process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
-process.CondDBCommon.connect = 'sqlite_file:RPC_GeoExtent2023_RPCEta2Upscope_mc.db'
+process.CondDBCommon.connect = 'sqlite_file:RPC_defaultValues_RPCEta2Upscope_mc.db'
 process.CondDBCommon.DBParameters.authenticationPath = '/afs/cern.ch/cms/DB/conddb'
 
 process.maxEvents = cms.untracked.PSet(
@@ -48,7 +48,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     timetype = cms.untracked.string('runnumber'),
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('RPCStripNoisesRcd'),
-        tag = cms.string('RPC_GeoExtent2023_RPCEta2Upscope_mc')
+        tag = cms.string('RPC_defaultValues_RPCEta2Upscope_mc')
     ))
 )
 
@@ -63,7 +63,7 @@ process.Test1 = cms.EDAnalyzer("MyPopConAnalyzer",
         noisemapfile = cms.FileInPath('CondTools/RPC/data/noise_short.txt'),
         clsmapfile = cms.FileInPath('CondTools/RPC/data/ClSizeTot.dat'),
         firstSince = cms.untracked.int32(1),
-        tag = cms.string('RPC_GeoExtent2023_RPCEta2Upscope_mc'),
+        tag = cms.string('RPC_defaultValues_RPCEta2Upscope_mc'),
         timingMap = cms.FileInPath('CondTools/RPC/data/RPCTiming_PhaseII.dat')
     )
 )

@@ -12,6 +12,8 @@
 <use   name="FWCore/ParameterSet"/>
 <use   name="FWCore/ServiceRegistry"/>
 <use   name="boost"/>
+<use   name="Geometry/RPCGeometry"/>
+<use   name="Geometry/GEMGeometry"/>
 <export>
   <lib   name="1"/>
 </export>
