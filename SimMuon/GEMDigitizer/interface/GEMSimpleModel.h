@@ -12,7 +12,6 @@
 
 #include "SimMuon/GEMDigitizer/interface/GEMDigiModel.h"
 
-
 class GEMGeometry;
 
 namespace CLHEP
@@ -53,29 +52,31 @@ private:
   double timeJitter_;
   double averageNoiseRate_;
   double averageClusterSize_;
+  std::vector<double> clsParametrization_;
   double signalPropagationSpeed_;
   bool cosmics_;
   int bxwidth_;
   int minBunch_;
   int maxBunch_;
   bool digitizeOnlyMuons_;
-  bool doNOTNoise_;
+  bool doBkgNoise_;
   bool doNoiseCLS_;
-  bool randomNoise_;
+  bool fixedRollRadius_;
   double minPabsNoiseCLS_;
   bool simulateIntrinsicNoise_;
   double scaleLumi_;
   double constGE11_;
   double slopeGE11_;
-  double constGE21_;
-  double slopeGE21_;
-  double constGE22_;
-  double slopeGE22_;
+  double constGE21Short_;
+  double slopeGE21Short_;
+  double constGE21Long_;
+  double slopeGE21Long_;
 
 
   CLHEP::RandFlat* flat1_;
   CLHEP::RandFlat* flat2_;
   CLHEP::RandFlat* flat3_;
+  CLHEP::RandFlat* flat4_;
   CLHEP::RandPoissonQ* poisson_;
   CLHEP::RandGaussQ* gauss1_;
   CLHEP::RandGaussQ* gauss2_;
@@ -83,6 +84,7 @@ private:
 
 };
 #endif
+
 
 
 
