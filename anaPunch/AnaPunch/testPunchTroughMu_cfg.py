@@ -19,7 +19,7 @@ readFiles.extend( [
 
 #'file:/afs/cern.ch/work/m/mileva/git/slhc7/CMSSW_6_2_0_SLHC7/src/minBias_reco.root'
 #'file:/afs/cern.ch/work/m/mileva/git/slhc7/CMSSW_6_2_0_SLHC7/src/punchtest_reco.root'
-'root://eoscms//eos/cms/store/user/mileva/minBiasTest/punchtest_reco.root'
+'root://eoscms//eos/cms/store/user/mileva/minBiasTest/minBias_reco.root'
 
 ]);
 
