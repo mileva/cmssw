@@ -7,16 +7,17 @@ process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
-process.load('Configuration.Geometry.GeometryExtended2023HGCalMuonReco_cff')
-process.load('Configuration.Geometry.GeometryExtended2023HGCalMuon_cff')
+process.load('Configuration.Geometry.GeometryExtended2023Muon_cff')
+process.load('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
+
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgrade2019', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
@@ -26,33 +27,15 @@ process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
 )
 
-process.contentAna = cms.EDAnalyzer("EventContentAnalyzer")
-
-# GEM digitizer
-process.load('SimMuon.GEMDigitizer.muonME0Digis_cfi')
-
-# customization of the process.pdigi sequence to add the GEM digitizer
-from SimMuon.GEMDigitizer.customizeME0Digi import *
-#process = customize_digi_addGEM(process)  # run all detectors digi
-process = customize_digi_addME0_muon_only(process) # only muon+GEM digi
-#process = customize_digi_addGEM_gem_only(process)  # only GEM digi
-
-runCSCforSLHC = True
-if runCSCforSLHC:
-    # upgrade CSC customizations
-    from SLHCUpgradeSimulations.Configuration.muonCustoms import *
-    process = unganged_me1a_geometry(process)
-    process = digitizer_timing_pre3_median(process)
-
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:out_sim_donotremove.root'
+        'file:out_sim.root'
     )
 )
 
 process.output = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string(
-        'file:out_digi_me0.test.root'
+        'file:out_digi.root'
     ),
     outputCommands = cms.untracked.vstring(
         'keep  *_*_*_*',
@@ -90,3 +73,9 @@ process.schedule = cms.Schedule(
     process.endjob_step,
     process.out_step
 )
+
+from SimMuon.GEMDigitizer.customizeGEMDigi import customize_digi_addGEM_addME0_muon_only
+process = customize_digi_addGEM_addME0_muon_only(process)
+
+from SLHCUpgradeSimulations.Configuration.combinedCustoms import cust_2023Muon
+process = cust_2023Muon(process)
