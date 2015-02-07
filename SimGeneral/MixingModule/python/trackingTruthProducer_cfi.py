@@ -11,7 +11,8 @@ trackingParticles = cms.PSet(
 	simHitCollections = cms.PSet(
 		muon = cms.VInputTag( cms.InputTag('g4SimHits','MuonDTHits'),
 			cms.InputTag('g4SimHits','MuonCSCHits'),
-			cms.InputTag('g4SimHits','MuonRPCHits') ),
+			cms.InputTag('g4SimHits','MuonRPCHits'),
+			cms.InputTag('g4SimHits','MuonGEMHits') ),
 		tracker = cms.VInputTag( cms.InputTag('g4SimHits','TrackerHitsTIBLowTof'),
 			cms.InputTag('g4SimHits','TrackerHitsTIBHighTof'),
 			cms.InputTag('g4SimHits','TrackerHitsTIDLowTof'),

@@ -7,6 +7,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "SimMuon/GEMDigitizer/interface/GEMDigiModel.h"
 #include "SimDataFormats/TrackerDigiSimLink/interface/StripDigiSimLink.h"
+#include "SimDataFormats/GEMDigiSimLink/interface/GEMDigiSimLink.h"
 #include "DataFormats/Common/interface/DetSetVector.h"
 
 #include "string"
@@ -18,6 +19,7 @@ class GEMDigiProducer : public edm::EDProducer
 public:
 
   typedef edm::DetSetVector<StripDigiSimLink> StripDigiSimLinks;
+  typedef edm::DetSetVector<GEMDigiSimLink> GEMDigiSimLinks;
 
   explicit GEMDigiProducer(const edm::ParameterSet& ps);
 

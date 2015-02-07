@@ -24,6 +24,7 @@
 <use   name="root"/>
 <use   name="rootrflx"/>
 <use   name="SimDataFormats/CrossingFrame"/>
+<use   name="SimDataFormats/GEMDigiSimLink"/>
 <use   name="SimGeneral/HepPDTRecord"/>
 <use   name="Utilities/General"/>
 <use   name="CommonTools/UtilAlgos"/>

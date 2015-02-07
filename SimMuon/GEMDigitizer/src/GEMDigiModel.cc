@@ -12,6 +12,7 @@ GEMDigiModel::fillDigis(int rollDetId, GEMDigiCollection& digis)
     GEMDigi digi(d.first, d.second); 
     digis.insertDigi(GEMDetId(rollDetId), digi);
     addLinks(d.first, d.second);
+    addLinksWithPartId(d.first, d.second);
   }
   strips_.clear();
 }
@@ -53,6 +54,25 @@ GEMDigiModel::addLinks(unsigned int strip, int bx)
     const int simTrackId(charge.first);
     auto link(StripDigiSimLink(strip, simTrackId, eventIdMap[simTrackId], charge.second/totalCharge));
     stripDigiSimLinks_.push_back(link);
+  }
+}
+
+void GEMDigiModel::addLinksWithPartId(unsigned int strip, int bx) {
+ 
+  std::pair<unsigned int, int > digi(strip, bx);
+  std::pair<DetectorHitMap::iterator, DetectorHitMap::iterator> channelHitItr 
+     = detectorHitMap_.equal_range(digi);
+
+  for( DetectorHitMap::iterator hitItr = channelHitItr.first; 
+                                hitItr != channelHitItr.second; ++hitItr){
+    const PSimHit * hit = (hitItr->second);
+
+    if(hit != 0) {
+      theGemDigiSimLinks_.push_back( GEMDigiSimLink(digi, hit->entryPoint(),hit->momentumAtEntry(),
+                                                   hit->timeOfFlight(),hit->energyLoss(),hit->particleType(), 
+                                                   hit->detUnitId(), hit->trackId(), hit->eventId(), hit->processType() ) );
+
+    }
   }
 }
 

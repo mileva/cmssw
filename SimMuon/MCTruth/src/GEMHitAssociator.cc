@@ -15,16 +15,21 @@ GEMHitAssociator::GEMHitAssociator(const edm::Event& e, const edm::EventSetup& e
 {
 
   if(useGEMs_){
+std::cout << "echo from constructor useGems_" << std::endl;
 
 	  if (crossingframe) {
 	    
+std::cout << "echo from constructor crossingframe" << std::endl;
+
 	    edm::Handle<CrossingFrame<PSimHit> > cf;
 	    LogTrace("GEMHitAssociator") <<"getting CrossingFrame<PSimHit> collection - "<<GEMsimhitsXFTag;
+std::cout << "GEMHitAssociator\t" <<"getting CrossingFrame<PSimHit> collection - "<<GEMsimhitsXFTag << std::endl;
 	    e.getByLabel(GEMsimhitsXFTag, cf);
 	    
 	    std::auto_ptr<MixCollection<PSimHit> > 
 	      GEMsimhits( new MixCollection<PSimHit>(cf.product()) );
 	    LogTrace("GEMHitAssociator") <<"... size = "<<GEMsimhits->size();
+std::cout << "GEMHitAssociator\t" << "... size = " <<GEMsimhits->size() << std::endl;
 
 	    //   MixCollection<PSimHit> & simHits = *hits;
 	    
@@ -35,10 +40,14 @@ GEMHitAssociator::GEMHitAssociator(const edm::Event& e, const edm::EventSetup& e
 	      }
 	    
 	  } else if (!GEMsimhitsTag.label().empty()) {
+std::cout << "echo from constructor elseif crossingframe" << std::endl;
+
 	    edm::Handle<edm::PSimHitContainer> GEMsimhits;
 	    LogTrace("GEMHitAssociator") <<"getting PSimHit collection - "<<GEMsimhitsTag;
+std::cout << "GEMHitAssociator\t" <<"getting PSimHit collection - "<<GEMsimhitsTag << std::endl;
 	    e.getByLabel(GEMsimhitsTag, GEMsimhits);    
 	    LogTrace("GEMHitAssociator") <<"... size = "<<GEMsimhits->size();
+std::cout << "GEMHitAssociator\t" <<"... size = "<<GEMsimhits->size() << std::endl;
 	    
 	    // arrange the hits by detUnit
 	    for(edm::PSimHitContainer::const_iterator hitItr = GEMsimhits->begin();
@@ -50,6 +59,7 @@ GEMHitAssociator::GEMHitAssociator(const edm::Event& e, const edm::EventSetup& e
 
 	  edm::Handle<DigiSimLinks> digiSimLinks;
 	  LogTrace("GEMHitAssociator") <<"getting GEM Strip DigiSimLink collection - "<<GEMdigisimlinkTag;
+std::cout << "final construction\t" <<"getting GEM Strip DigiSimLink collection - "<<GEMdigisimlinkTag << std::endl;
 	  e.getByLabel(GEMdigisimlinkTag, digiSimLinks);
 	  theDigiSimLinks = digiSimLinks.product();
 
@@ -64,7 +74,7 @@ std::vector<GEMHitAssociator::SimHitIdpr> GEMHitAssociator::associateRecHit(cons
 
   if(useGEMs_){
 	
-	  //std::cout<<"gemboo "<<useGEMs_<<std::endl;
+	  std::cout<<"gemboo "<<useGEMs_<<std::endl;
 
 	  const TrackingRecHit * hitp = &hit;
 	  const GEMRecHit * gemrechit = dynamic_cast<const GEMRecHit *>(hitp);
@@ -90,6 +100,7 @@ std::vector<GEMHitAssociator::SimHitIdpr> GEMHitAssociator::associateRecHit(cons
 				SimHitIdpr currentId(itlink->SimTrackId(), itlink->eventId());
 				if(find(matched.begin(),matched.end(),currentId ) == matched.end())
 					matched.push_back(currentId);
+std::cout << "matched" << std::endl;
 
 			}
 

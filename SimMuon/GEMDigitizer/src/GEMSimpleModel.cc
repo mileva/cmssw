@@ -103,6 +103,10 @@ void GEMSimpleModel::simulateSignal(const GEMEtaPartition* roll, const edm::PSim
   stripDigiSimLinks_.clear();
   detectorHitMap_.clear();
   stripDigiSimLinks_ = StripDigiSimLinks(roll->id().rawId());
+
+  theGemDigiSimLinks_.clear();
+  theGemDigiSimLinks_ = GEMDigiSimLinks(roll->id().rawId());
+
   bool digiMuon = false;
   bool digiElec = false;
   for (edm::PSimHitContainer::const_iterator hit = simHits.begin(); hit != simHits.end(); ++hit)

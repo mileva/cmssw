@@ -5,7 +5,7 @@
 #   SimMuon/MCTruth             V02-05-00-03 (35X) or V02-06-00+ (37X+)
 
 from SimGeneral.MixingModule.mixNoPU_cfi                          import *
-from SimGeneral.TrackingAnalysis.trackingParticlesNoSimHits_cfi   import * 
+#from SimGeneral.TrackingAnalysis.trackingParticlesNoSimHits_cfi   import *  #rumi: comment just to run
 from SimMuon.MCTruth.MuonAssociatorByHitsESProducer_NoSimHits_cfi import * 
 
 classByHitsTM = cms.EDProducer("MuonMCClassifier",
@@ -35,7 +35,7 @@ classByHitsSta = classByHitsTM.clone(
 
 muonClassificationByHits = cms.Sequence(
     mix +
-    trackingParticlesNoSimHits +
+#    trackingParticlesNoSimHits +   #rumi: comment just to run
     ( classByHitsTM      +
       classByHitsTMLSAT  +
       classByHitsGlb     +  
