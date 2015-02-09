@@ -10,7 +10,7 @@
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "DataFormats/MuonDetId/interface/GEMDetId.h"
-#include "SimDataFormats/TrackerDigiSimLink/interface/StripDigiSimLink.h"
+#include "SimDataFormats/GEMDigiSimLink/interface/GEMDigiSimLink.h"
 
 #include <vector>
 #include <map>
@@ -32,32 +32,37 @@ class GEMHitAssociator {
 
  public:
 
-   typedef edm::DetSetVector<StripDigiSimLink> DigiSimLinks;
-   typedef edm::DetSet<StripDigiSimLink> LayerLinks;
+   typedef edm::DetSetVector<GEMDigiSimLink> GEMDigiSimLinks;
+//   typedef edm::DetSet<GEMDigiSimLink> LayerLinks;
    typedef std::pair<uint32_t, EncodedEventId> SimHitIdpr;
 
-   // Constructor with configurable parameters
-   GEMHitAssociator(const edm::Event&, const edm::EventSetup&, const edm::ParameterSet&); 
+  // Constructor with configurable parameters
+  GEMHitAssociator(const edm::Event&, const edm::EventSetup&, const edm::ParameterSet&); 
 
-   // Destructor
-   ~GEMHitAssociator(){}
+  // Destructor
+  ~GEMHitAssociator(){}
 
    std::vector<SimHitIdpr> associateRecHit(const TrackingRecHit & hit);
+   std::set<GEMDigiSimLink> findGEMDigiSimLink(uint32_t gemDetId, int strip, int bx);
+   //   const PSimHit* linkToSimHit(GEMDigiSimLink link);
+
 
  private:
-
-   const DigiSimLinks * theDigiSimLinks;
-
+   bool useGEMs_;
+   edm::Handle< edm::DetSetVector<GEMDigiSimLink> > _thelinkDigis;
    edm::InputTag GEMdigisimlinkTag;
  
    bool crossingframe;
-   bool useGEMs_;
    edm::InputTag GEMsimhitsTag;
    edm::InputTag GEMsimhitsXFTag;
 
    std::map<unsigned int, edm::PSimHitContainer> _SimHitMap;
 
+//   const DigiSimLinks * theDigiSimLinks;
+
  };
 
 #endif
+
+
 

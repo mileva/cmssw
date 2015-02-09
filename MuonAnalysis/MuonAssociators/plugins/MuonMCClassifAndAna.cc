@@ -397,9 +397,9 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
       {
         reco::TrackRef glbtrackref = (*myMuons)[i].globalTrack();
 
-        if (glbtrackref->pt() > muonPtCut_ && fabs(glbtrackref->eta()) >= muonMinEtaCut_ && fabs(glbtrackref->eta()) <= muonMaxEtaCut_)
-//            && fabs((*myMuons)[i].time().timeAtIpInOut) < 12.5)
-//            && glbtrackref->hitPattern().numberOfValidMuonHits() > 0)
+        if (glbtrackref->pt() > muonPtCut_ && fabs(glbtrackref->eta()) >= muonMinEtaCut_ && fabs(glbtrackref->eta()) <= muonMaxEtaCut_
+            && fabs((*myMuons)[i].time().timeAtIpInOut) <= 12.5
+            && glbtrackref->hitPattern().numberOfValidMuonHits() > 0)
         {
           selGlbMuons.push_back(rmu);
           N_Muons->Fill(3);
@@ -424,8 +424,8 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
 
         if (statrackref->pt() > muonPtCut_ && fabs(statrackref->eta()) >= muonMinEtaCut_ && fabs(statrackref->eta()) <= muonMaxEtaCut_)
         {
-//          if ((*myMuons)[i].time().timeAtIpInOut == 0 && statrackref->hitPattern().numberOfValidMuonHits() > 1)
-//          if ( ((*myMuons)[i].time().timeAtIpInOut) < 12.5 )
+          if ((*myMuons)[i].time().timeAtIpInOut <= 12.5 && statrackref->hitPattern().numberOfValidMuonHits() > 0)
+//          if (((*myMuons)[i].time().timeAtIpInOut) < 12.5 )
           {
             selStaMuons.push_back(rmu);
             N_Muons->Fill(19);
@@ -444,12 +444,12 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
     bool tight = isTight(iEvent, (*myMuons)[i]);
     if (tight)
     {
-//      if ((*myMuons)[i].outerTrack().isNonnull())
-//      {
-//        reco::TrackRef statrackref = (*myMuons)[i].outerTrack();
-        if ((*myMuons)[i].pt() > muonPtCut_ && fabs((*myMuons)[i].eta()) >= muonMinEtaCut_ && fabs((*myMuons)[i].eta()) <= muonMaxEtaCut_)
-//            && fabs((*myMuons)[i].time().timeAtIpInOut) < 12.5)
-//            && statrackref->hitPattern().numberOfValidMuonHits() > 0)
+      if ((*myMuons)[i].globalTrack().isNonnull())
+      {
+        reco::TrackRef statrackref = (*myMuons)[i].outerTrack();
+        if ((*myMuons)[i].pt() > muonPtCut_ && fabs((*myMuons)[i].eta()) >= muonMinEtaCut_ && fabs((*myMuons)[i].eta()) <= muonMaxEtaCut_
+            && fabs((*myMuons)[i].time().timeAtIpInOut) <= 12.5
+            && statrackref->hitPattern().numberOfValidMuonHits() > 0)
         {
           N_Muons->Fill(35);
           N_Muons_norm->Fill(35);
@@ -460,7 +460,7 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
            if (debug)
             std::cout << "I am Tight muon!" << std::endl;  //
         }
-//      }
+      }
     }  //end tight
 
     if (muon::isLooseMuon ((*myMuons)[i]))
@@ -469,8 +469,8 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
 //      {
 //        reco::TrackRef statrackref = (*myMuons)[i].outerTrack();
 
-        if ((*myMuons)[i].pt() > muonPtCut_ && fabs((*myMuons)[i].eta()) >= muonMinEtaCut_ && fabs((*myMuons)[i].eta()) <= muonMaxEtaCut_)
-//m            && fabs((*myMuons)[i].time().timeAtIpInOut) < 25)
+        if ((*myMuons)[i].pt() > muonPtCut_ && fabs((*myMuons)[i].eta()) >= muonMinEtaCut_ && fabs((*myMuons)[i].eta()) <= muonMaxEtaCut_
+            && fabs((*myMuons)[i].time().timeAtIpInOut) <= 25)
 //            && statrackref->hitPattern().numberOfValidMuonHits() > 0)
         {
           N_Muons->Fill(51);
@@ -498,7 +498,7 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
   MuonAssociatorByHits::MuonToSimCollection recSimColl_glb;
   MuonAssociatorByHits::SimToMuonCollection simRecColl_glb;
   edm::LogVerbatim("MuonMCClassifAndAna") << "\n Global Muon association by global track"; //
-  assoByHits->associateMuons(recSimColl_glb, simRecColl_glb, selGlbMuons, MuonAssociatorByHits::OuterTk, allTPs, &iEvent, &iSetup); //
+  assoByHits->associateMuons(recSimColl_glb, simRecColl_glb, selGlbMuons, MuonAssociatorByHits::GlobalTk, allTPs, &iEvent, &iSetup); //
 
 //standalone muon
   MuonAssociatorByHits::MuonToSimCollection recSimColl_sta;
@@ -510,14 +510,14 @@ void MuonMCClassifAndAna::analyze(const edm::Event& iEvent, const edm::EventSetu
   MuonAssociatorByHits::MuonToSimCollection recSimColl_tight;
   MuonAssociatorByHits::SimToMuonCollection simRecColl_tight;
   edm::LogVerbatim("MuonMCClassifAndAna") << "\n Tight Muon association by global track "; //
-  assoByHits->associateMuons(recSimColl_tight, simRecColl_tight, selTightMuons, MuonAssociatorByHits::OuterTk, allTPs, &iEvent, &iSetup); //
-//  assoByHits->associateMuons(recSimColl_tight, simRecColl_tight, selTightMuons, MuonAssociatorByHits::GlobalTk, allTPs, &iEvent, &iSetup); //
+//  assoByHits->associateMuons(recSimColl_tight, simRecColl_tight, selTightMuons, MuonAssociatorByHits::OuterTk, allTPs, &iEvent, &iSetup); //
+  assoByHits->associateMuons(recSimColl_tight, simRecColl_tight, selTightMuons, MuonAssociatorByHits::GlobalTk, allTPs, &iEvent, &iSetup); //
 
 //Loose
   MuonAssociatorByHits::MuonToSimCollection recSimColl_loose;
   MuonAssociatorByHits::SimToMuonCollection simRecColl_loose;
-  edm::LogVerbatim("MuonMCClassifAndAna") << "\n Loose Muon association by inner track "; //
-  assoByHits->associateMuons(recSimColl_loose, simRecColl_loose, selLooseMuons, MuonAssociatorByHits::OuterTk, allTPs, &iEvent, &iSetup); //
+  edm::LogVerbatim("MuonMCClassifAndAna") << "\n Loose Muon association by Segments track "; //
+  assoByHits->associateMuons(recSimColl_loose, simRecColl_loose, selLooseMuons, MuonAssociatorByHits::Segments, allTPs, &iEvent, &iSetup); //
 
   if (debug) std::cout << "there are " << nmu << " reco::Muons" << std::endl;
   if (debug) std::cout << "=================================" << std::endl;
