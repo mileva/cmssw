@@ -71,10 +71,11 @@ public:
     int nRecHits() const { return theGEMRecHits.size(); }        
 
     GEMDetId gemDetId() const {
-      DetId detid = geographicalId();
-      GEMDetId rollid = GEMDetId(detid);
-      GEMDetId chamid = rollid.chamberId();
-	return chamid;
+      return geographicalId();
+      /* DetId detid = geographicalId(); */
+      /* GEMDetId rollid = GEMDetId(detid); */
+      /* GEMDetId chamid = rollid.chamberId(); */
+      /* return chamid; */
     }
 
     /*
