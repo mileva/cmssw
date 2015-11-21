@@ -411,6 +411,14 @@ std::vector<GEMSegment> GEMSegAlgoPV::buildSegments(const EnsembleHitContainer& 
   }
 
   edm::LogVerbatim("GEMSegAlgoPV") << "[GEMSegAlgoPV::buildSegments] will now try to fit a GEMSegment from collection of "<<rechits.size()<<" GEM RecHits";
+  for (auto rh=rechits.begin(); rh!=rechits.end(); ++rh){
+    auto gemid = (*rh)->gemId();
+    // auto rhr = gemGeom->etaPartition(gemid);
+    auto rhLP = (*rh)->localPosition();
+    // auto rhGP = rhr->toGlobal(rhLP);
+    edm::LogVerbatim("GEMSegAlgoPV") << "[RecHit :: Loc x = "<<std::showpos<<std::setw(9)<<rhLP.x()<<" Loc y = "<<std::showpos<<std::setw(9)<<rhLP.y()
+				     <<" BX = "<<std::showpos<<(*rh)->BunchX()<<" -- "<<gemid.rawId()<<" = "<<gemid<<" ]";
+  }
   #ifdef EDM_ML_DEBUG // have lines below only compiled when in debug mode 
   for (auto rh=rechits.begin(); rh!=rechits.end(); ++rh){
     auto gemid = (*rh)->gemId();

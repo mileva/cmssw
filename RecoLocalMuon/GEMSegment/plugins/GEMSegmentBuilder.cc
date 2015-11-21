@@ -59,7 +59,8 @@ void GEMSegmentBuilder::build(const GEMRecHitCollection* recHits, GEMSegmentColl
     int station = 0; 
     if(it2->gemId().station()==1) station=1;
     else if(it2->gemId().station()==2 || it2->gemId().station()==3) station=3;
-    GEMDetId id(it2->gemId().region(),1,station,0,it2->gemId().chamber(),0);
+    // set layer as 1 since no superchamber here
+    GEMDetId id(it2->gemId().region(),1,station,1,it2->gemId().chamber(),0);
     // edm::LogVerbatim("GEMSegmentBuilder") << "GEM Reference id :: "<<id<< " = " << id.rawId();
 
     // retrieve vector of GEMRecHits associated to the reference id
@@ -82,7 +83,8 @@ void GEMSegmentBuilder::build(const GEMRecHitCollection* recHits, GEMSegmentColl
     // !!! important !!! for GE2/1 make that the chamber is always in station 3
     int chambidstat = pphit->gemId().station(); if(chambidstat==2) chambidstat=3;
     // would layer = 0 work? actually it should ...
-    GEMDetId chamberid = GEMDetId(pphit->gemId().region(), 1, chambidstat, 0, pphit->gemId().chamber(), 0); 
+    // set layer as 1 since no superchamber here
+    GEMDetId chamberid = GEMDetId(pphit->gemId().region(), 1, chambidstat, 1, pphit->gemId().chamber(), 0); 
     const GEMSuperChamber* chamber = geom_->superChamber(chamberid);
     for(auto rechit = enIt->second.begin(); rechit != enIt->second.end(); ++rechit) {
       gemRecHits.push_back(*rechit);

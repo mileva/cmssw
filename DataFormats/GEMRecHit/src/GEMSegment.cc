@@ -15,8 +15,8 @@ namespace {
     int station, layer;
     if (id.station()==1) station = 1;
     else if (id.station()==2 || id.station()==3) station = 3;
-    else station = 0; 
-    layer = 0;
+    else station = 0;
+    layer = 1;//no superchamber in 62xSLHC
     return GEMDetId(id.region(),id.ring(),station,layer,id.chamber(),id.roll());
   }
 }
