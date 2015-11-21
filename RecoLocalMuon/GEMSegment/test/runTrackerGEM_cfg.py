@@ -18,8 +18,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(False))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10))
+process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+#process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+#process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(False))
 
 #process.load('RecoLocalMuon.GEMRecHit.me0RecHits_cfi')
 #process.load('RecoLocalMuon.GEMRecHit.me0Segments_cfi')

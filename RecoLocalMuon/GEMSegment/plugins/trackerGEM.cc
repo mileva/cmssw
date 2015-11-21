@@ -77,6 +77,7 @@ void trackerGEM::produce(edm::Event& ev, const edm::EventSetup& setup) {
     //Initializing gem plane
 
     //Remove later
+    if (thisTrack->pt() < 1.5) continue;
     if (std::abs(thisTrack->eta()) < 1.5) continue;
 
     // std::cout << "**********************************************************"<<std::endl;
