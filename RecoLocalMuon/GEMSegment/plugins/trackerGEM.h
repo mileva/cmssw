@@ -37,42 +37,43 @@ class FreeTrajectoryState;
 class MagneticField;
 class SteppingHelixPropagator;
 class trackerGEM : public edm::EDProducer {
-public:
-    /// Constructor
-    explicit trackerGEM(const edm::ParameterSet&);
-    /// Destructor
-    ~trackerGEM();
-    /// Produce the GEMSegment collection
-    virtual void produce(edm::Event&, const edm::EventSetup&);
+ public:
+  /// Constructor
+  explicit trackerGEM(const edm::ParameterSet&);
+  /// Destructor
+  ~trackerGEM();
+  /// Produce the GEMSegment collection
+  virtual void produce(edm::Event&, const edm::EventSetup&);
 
     
-    virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+  virtual void beginRun(edm::Run const&, edm::EventSetup const&);
+  virtual void endJob();
 
-    reco::MuonChamberMatch* findGEMSegment(const reco::Track&, const GEMSegmentCollection&, int station, const SteppingHelixPropagator*);
+  reco::MuonChamberMatch* findGEMSegment(const reco::Track&, const GEMSegmentCollection&, int station, const SteppingHelixPropagator*);
     
-    FreeTrajectoryState getFTS(const GlobalVector& , const GlobalVector& , 
-				   int , const AlgebraicSymMatrix66& ,
-				   const MagneticField* );
+  FreeTrajectoryState getFTS(const GlobalVector& , const GlobalVector& , 
+			     int , const AlgebraicSymMatrix66& ,
+			     const MagneticField* );
 
-    FreeTrajectoryState getFTS(const GlobalVector& , const GlobalVector& , 
-				   int , const AlgebraicSymMatrix55& ,
-				   const MagneticField* );
+  FreeTrajectoryState getFTS(const GlobalVector& , const GlobalVector& , 
+			     int , const AlgebraicSymMatrix55& ,
+			     const MagneticField* );
 
-    void getFromFTS(const FreeTrajectoryState& ,
+  void getFromFTS(const FreeTrajectoryState& ,
 		  GlobalVector& , GlobalVector& , 
 		  int& , AlgebraicSymMatrix66& );
 
-private:
+ private:
 
 
-    edm::ESHandle<GEMGeometry> gemGeom;
-    double maxPullXGE11_, maxDiffXGE11_, maxPullYGE11_, maxDiffYGE11_,
-      maxPullXGE21_, maxDiffXGE21_, maxPullYGE21_, maxDiffYGE21_,
-      maxDiffPhiDirection_;
-    edm::EDGetTokenT<GEMSegmentCollection> gemSegmentsToken_;
-    edm::EDGetTokenT<reco::TrackCollection> generalTracksToken_;
+  edm::ESHandle<GEMGeometry> gemGeom;
+  double maxPullXGE11_, maxDiffXGE11_, maxPullYGE11_, maxDiffYGE11_,
+    maxPullXGE21_, maxDiffXGE21_, maxPullYGE21_, maxDiffYGE21_,
+    maxDiffPhiDirection_;
+  edm::EDGetTokenT<GEMSegmentCollection> gemSegmentsToken_;
+  edm::EDGetTokenT<reco::TrackCollection> generalTracksToken_;
 
-  
+  float ntracks, nmatch, nmatch_ge11, nmatch_ge21;
 };
 
 #endif

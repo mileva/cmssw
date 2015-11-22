@@ -75,25 +75,31 @@ void trackerGEM::produce(edm::Event& ev, const edm::EventSetup& setup) {
   for (std::vector<Track>::const_iterator thisTrack = generalTracks->begin();
        thisTrack != generalTracks->end(); ++thisTrack,++TrackNumber){
     //Initializing gem plane
-
     //Remove later
     if (thisTrack->pt() < 1.5) continue;
     if (std::abs(thisTrack->eta()) < 1.5) continue;
 
-    // std::cout << "**********************************************************"<<std::endl;
-    // std::cout << "trying match to track pt = " << thisTrack->pt()
-    // 	      << " eta = " << thisTrack->eta()
-    // 	      << " phi = " << thisTrack->phi()
-    // 	      <<std::endl;
+    ++ntracks;
+    edm::LogVerbatim("trackerGEM") << "**********************************************************"<<std::endl;
+    edm::LogVerbatim("trackerGEM") << "trying match to track pt = " << thisTrack->pt()
+    	      << " eta = " << thisTrack->eta()
+    	      << " phi = " << thisTrack->phi()
+    	      <<std::endl;
      
     reco::MuonChamberMatch* foundGE11 = findGEMSegment(*thisTrack, *gemSegments, 1, ThisshProp);
     reco::MuonChamberMatch* foundGE21 = findGEMSegment(*thisTrack, *gemSegments, 3, ThisshProp);
 
     if (!foundGE11 && !foundGE21) continue;
-
+    ++nmatch;
     std::vector<reco::MuonChamberMatch> muonChamberMatches;
-    if (foundGE11) muonChamberMatches.push_back(*foundGE11);
-    if (foundGE21) muonChamberMatches.push_back(*foundGE21);
+    if (foundGE11){
+      muonChamberMatches.push_back(*foundGE11);
+      ++nmatch_ge11;
+    }
+    if (foundGE21){
+      muonChamberMatches.push_back(*foundGE21);
+      ++nmatch_ge21;
+    }
 
     TrackRef thisTrackRef(generalTracks,TrackNumber);
     	   
@@ -175,6 +181,15 @@ void trackerGEM::getFromFTS(const FreeTrajectoryState& fts,
 void trackerGEM::beginRun(edm::Run const& iRun, edm::EventSetup const& iSetup)
 {
   iSetup.get<MuonGeometryRecord>().get(gemGeom);
+  ntracks = 0; nmatch = 0; nmatch_ge11 = 0; nmatch_ge21 = 0;
+
+}
+void trackerGEM::endJob()
+{
+  std::cout << "ntracks  = "<< ntracks <<std::endl;
+  std::cout << "eff      = "<< nmatch/ntracks <<std::endl;
+  std::cout << "eff ge11 = "<< nmatch_ge11/ntracks <<std::endl;
+  std::cout << "eff ge21 = "<< nmatch_ge21/ntracks <<std::endl;
 }
 
 reco::MuonChamberMatch* trackerGEM::findGEMSegment(const reco::Track& track, const GEMSegmentCollection& gemSegments, int station, const SteppingHelixPropagator* shPropagator)
@@ -203,13 +218,13 @@ reco::MuonChamberMatch* trackerGEM::findGEMSegment(const reco::Track& track, con
     auto chamber = gemGeom->chamber(id);
     GlobalPoint SegPos(chamber->toGlobal(thisPosition));
 
-    // std::cout <<" segment = "<< id.station()
-    // 	      <<" chamber = "<< id.chamber()
-    // 	      <<" roll = "<< id.roll()
-    // 	      <<" x,y,z = "<< SegPos.x()
-    // 	      <<", "<< SegPos.y()
-    // 	      <<", "<< SegPos.z()
-    //   	      << std::endl;
+    edm::LogVerbatim("trackerGEM") <<" segment = "<< id.station()
+    	      <<" chamber = "<< id.chamber()
+    	      <<" roll = "<< id.roll()
+    	      <<" x,y,z = "<< SegPos.x()
+    	      <<", "<< SegPos.y()
+    	      <<", "<< SegPos.z()
+      	      << std::endl;
     
     //      if ( zSign * chamber->toGlobal(thisSegment->localPosition()).z() < 0 ) continue;
     // add in deltaR cut
@@ -297,40 +312,38 @@ reco::MuonChamberMatch* trackerGEM::findGEMSegment(const reco::Track& track, con
       if ( (std::abs(thisPosition.y()-r3FinalReco.y()) < (maxPullYGE21_ * sigmay)) &&
 	   (std::abs(thisPosition.y()-r3FinalReco.y()) < maxDiffYGE21_ ) ) Y_MatchFound = true;
     }
-    double segLocalPhi = thisDirection.phi()-M_PI/2;
-    if (segLocalPhi < 0) segLocalPhi += M_PI;
+    double segLocalPhi = thisDirection.phi();
+    //-M_PI/2;
+    //if (segLocalPhi < 0) segLocalPhi += M_PI;
     
     if (std::abs(reco::deltaPhi(p3FinalReco.phi(),segLocalPhi))  < maxDiffPhiDirection_) Dir_MatchFound = true;
 
-    // std::cout <<" station = "<< station
-    // 	      <<" track local phi = "<< p3FinalReco.phi() 
-    // 	      <<" seg local phi = "<< segLocalPhi
-    // 	      <<" deltaPhi = "<< reco::deltaPhi(p3FinalReco.phi(),segLocalPhi)
-    // 	      << std::endl;
-    // std::cout <<" station = "<< station
-    // 	      <<" roll = "<< id.roll()
-    // 	      <<" gem hit Y = "<< SegPos.y()
-    // 	      <<" track Y = "<< r3FinalReco_glob.y()
-    // 	      <<" deltaX = "<< thisPosition.x()-r3FinalReco.x()
-    // 	      <<" deltaY = "<< thisPosition.y()-r3FinalReco.y()
-    // 	      << std::endl;
-    // std::cout <<" local Dir eta "<< chamber->toGlobal(thisDirection).eta()
-    // 	      <<" phi "<< chamber->toGlobal(thisDirection).phi()
-    //   	      << std::endl;
+    edm::LogVerbatim("trackerGEM") <<" station = "<< station
+				   <<" track phi = "<< p3FinalReco.phi() 
+				   <<" seg phi = "<< segLocalPhi
+				   <<" deltaPhi = "<< reco::deltaPhi(p3FinalReco.phi(),segLocalPhi)
+				   << std::endl;
 
-    // for (auto rechit :thisSegment->specificRecHits()){
-    //   GEMDetId rechitid = rechit.gemId();
-    //   //auto rechitroll = gemGeom->etaPartition(rechitid); 
-    //   std::cout <<" rec hit = "<< rechitid.station()
-    // 		<<" chamber = "<< rechitid.chamber()
-    // 		<<" roll = "<< rechitid.roll()
-    // 		<<" x,y,z = "<< rechit.localPosition().x()
-    // 		<<", "<< rechit.localPosition().y()
-    // 		<<", "<< rechit.localPosition().z()
-    // 		<<" layer = "<< rechitid.layer()
-    // 		<< std::endl;
+    edm::LogVerbatim("trackerGEM") <<" deltaX = "<< thisPosition.x()-r3FinalReco.x()
+				   <<" deltaX/sigma = "<< (thisPosition.x()-r3FinalReco.x())/sigmax
+				   << std::endl;
+    edm::LogVerbatim("trackerGEM") <<" deltaY = "<< thisPosition.y()-r3FinalReco.y()
+				   <<" deltaY/sigma = "<< (thisPosition.y()-r3FinalReco.y())/sigmay
+				   << std::endl;
 
-    // }
+    for (auto rechit :thisSegment->specificRecHits()){
+      GEMDetId rechitid = rechit.gemId();
+      //auto rechitroll = gemGeom->etaPartition(rechitid); 
+      edm::LogVerbatim("trackerGEM") <<" rec hit = "<< rechitid.station()
+    		<<" chamber = "<< rechitid.chamber()
+    		<<" roll = "<< rechitid.roll()
+    		<<" x,y,z = "<< rechit.localPosition().x()
+    		<<", "<< rechit.localPosition().y()
+    		<<", "<< rechit.localPosition().z()
+    		<<" layer = "<< rechitid.layer()
+    		<< std::endl;
+
+    }
       
     //Check for a Match, and if there is a match, check the delR from the segment, keeping only the closest in MuonCandidate
     if (X_MatchFound && Y_MatchFound && Dir_MatchFound) {
