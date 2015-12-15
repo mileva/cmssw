@@ -1,8 +1,8 @@
-#include "SimMuon/GEMDigitizer/interface/ME0PreRecoNoSmearModel.h"
-#include "Geometry/GEMGeometry/interface/ME0EtaPartitionSpecs.h"
+#include "SimMuon/GEMDigitizer/interface/GEMPreRecoNoSmearModel.h"
+#include "Geometry/GEMGeometry/interface/GEMEtaPartitionSpecs.h"
 #include "Geometry/CommonTopologies/interface/TrapezoidalStripTopology.h"
-#include "Geometry/GEMGeometry/interface/ME0Geometry.h"
-#include "DataFormats/GEMDigi/interface/ME0DigiPreReco.h"
+#include "Geometry/GEMGeometry/interface/GEMGeometry.h"
+#include "DataFormats/GEMDigi/interface/GEMDigiPreReco.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include <cmath>
@@ -10,13 +10,13 @@
 #include <map>
 
 
-ME0PreRecoNoSmearModel::ME0PreRecoNoSmearModel(const edm::ParameterSet& config) 
-  : ME0DigiPreRecoModel(config)
+GEMPreRecoNoSmearModel::GEMPreRecoNoSmearModel(const edm::ParameterSet& config) 
+  : GEMDigiPreRecoModel(config)
 {
 }
 
 void 
-ME0PreRecoNoSmearModel::simulateSignal(const ME0EtaPartition* roll,
+GEMPreRecoNoSmearModel::simulateSignal(const GEMEtaPartition* roll,
 				const edm::PSimHitContainer& simHits)
 {
 
@@ -32,15 +32,16 @@ ME0PreRecoNoSmearModel::simulateSignal(const ME0EtaPartition* roll,
     float t = hit.timeOfFlight();
     int pdgid=hit.particleType();
      // please keep hit time always 0 for this model
-    ME0DigiPreReco digi(x,y,ex,ey,corr,t,pdgid,1);
+    GEMDigiPreReco digi(x,y,ex,ey,corr,t,pdgid,1);
     digi_.insert(digi);
   }
 }
 
+/*
 void 
-ME0PreRecoNoSmearModel::simulateNoise(const ME0EtaPartition* roll)
+GEMPreRecoNoSmearModel::simulateNoise(const GEMEtaPartition* roll)
 {
 }
-
+*/
 
 

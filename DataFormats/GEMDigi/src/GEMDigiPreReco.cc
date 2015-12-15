@@ -7,11 +7,11 @@
  */
 
 
-#include "DataFormats/GEMDigi/interface/ME0DigiPreReco.h"
+#include "DataFormats/GEMDigi/interface/GEMDigiPreReco.h"
 #include <iostream>
 
-//ME0DigiPreReco::ME0DigiPreReco (float x, float y, float ex, float ey, float corr, float tof) :
-ME0DigiPreReco::ME0DigiPreReco (float x, float y, float ex, float ey, float corr, float tof, int pdgid, bool prompt) :
+//GEMDigiPreReco::GEMDigiPreReco (float x, float y, float ex, float ey, float corr, float tof) :
+GEMDigiPreReco::GEMDigiPreReco (float x, float y, float ex, float ey, float corr, float tof, int pdgid, bool prompt) :
   x_(x),
   y_(y),
   ex_(ex),
@@ -22,7 +22,7 @@ ME0DigiPreReco::ME0DigiPreReco (float x, float y, float ex, float ey, float corr
   prompt_(prompt)
 {}
 
-ME0DigiPreReco::ME0DigiPreReco ():
+GEMDigiPreReco::GEMDigiPreReco ():
   x_(0.),
   y_(0.),
   ex_(0.),
@@ -35,23 +35,24 @@ ME0DigiPreReco::ME0DigiPreReco ():
 
 
 // Comparison
-bool ME0DigiPreReco::operator == (const ME0DigiPreReco& digi) const
+bool GEMDigiPreReco::operator == (const GEMDigiPreReco& digi) const
 {
   return x_ == digi.x() and y_ == digi.y() and tof_ == digi.tof();
 }
 
 
 // Comparison
-bool ME0DigiPreReco::operator != (const ME0DigiPreReco& digi) const
+bool GEMDigiPreReco::operator != (const GEMDigiPreReco& digi) const
 {
   return x_ != digi.x() or y_ != digi.y() or tof_ != digi.tof();
 }
 
 
 ///Precedence operator
-bool ME0DigiPreReco::operator<(const ME0DigiPreReco& digi) const
+bool GEMDigiPreReco::operator<(const GEMDigiPreReco& digi) const
 {
-  if (digi.tof() == tof_){
+
+   if (digi.tof() == tof_){
     if(digi.x() == x_)
       return digi.y() < y_;
     else 
@@ -62,13 +63,13 @@ bool ME0DigiPreReco::operator<(const ME0DigiPreReco& digi) const
 }
 
 
-std::ostream & operator<<(std::ostream & o, const ME0DigiPreReco& digi)
+std::ostream & operator<<(std::ostream & o, const GEMDigiPreReco& digi)
 {
 //  return o << "local x=" << digi.x() << " cm y=" << digi.y()<<" cm ex=" << digi.ex() << " cm ey=" << digi.ey()<< " cm tof="<<digi.tof()<<" ns";
-  return o << "local x=" << digi.x() << " cm y=" << digi.y()<<" cm ex=" << digi.ex() << " cm ey=" << digi.ey()<< " cm tof="<<digi.tof()<<" ns"<<" pdgID "<<digi.pdgid()<<" prompt? "<<digi.prompt();
+  return o <<  "local x=" << digi.x() << " cm y=" << digi.y()<<" cm ex=" << digi.ex() << " cm ey=" << digi.ey()<< " cm tof="<<digi.tof()<<" ns"<<" pdgID "<<digi.pdgid()<<" prompt? "<<digi.prompt();
 }
 
-void ME0DigiPreReco::print() const
+void GEMDigiPreReco::print() const
 {
 //  std::cout << "local x=" << this->x() << " cm y=" << this->y() <<" cm tof="<<this->tof()<<" ns"<<std::endl;
   std::cout << "local x=" << this->x() << " cm y=" << this->y() <<" cm tof="<<this->tof()<<" ns"<<" pdgID "<<this->pdgid()<<" prompt? "<<this->prompt()<<std::endl;

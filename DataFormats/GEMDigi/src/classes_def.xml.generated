@@ -26,6 +26,7 @@
 
 <class name="ME0DigiPreReco" ClassVersion="12">
  <version ClassVersion="12" checksum="2284466085"/>
+ <version ClassVersion="12" checksum="2284466085"/>
  <version ClassVersion="10" checksum="79088950"/>
  <version ClassVersion="11" checksum="1930707888"/>
 </class>
