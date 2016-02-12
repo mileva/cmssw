@@ -69,6 +69,7 @@ private:
   bool    preClustering_useChaining;
   double  dPhiChainBoxMax;
   double  dEtaChainBoxMax;
+  double  dTimeChainBoxMax;
   int     maxRecHitsInCluster;
   bool    clusterOnlySameBXRecHits;
   // bool    useGE21Short;

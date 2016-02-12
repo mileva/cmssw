@@ -32,6 +32,7 @@ GEMSegAlgoPV::GEMSegAlgoPV(const edm::ParameterSet& ps) : GEMSegmentAlgorithm(ps
   preClustering_useChaining = ps.getParameter<bool>("preClusteringUseChaining");
   dPhiChainBoxMax           = ps.getParameter<double>("dPhiChainBoxMax");
   dEtaChainBoxMax           = ps.getParameter<double>("dEtaChainBoxMax");
+  dTimeChainBoxMax          = ps.getParameter<double>("dTimeChainBoxMax");
   maxRecHitsInCluster       = ps.getParameter<int>("maxRecHitsInCluster");
   clusterOnlySameBXRecHits  = ps.getParameter<bool>("clusterOnlySameBXRecHits");
   // useGE21Short              = ps.getParameter<bool>("useGE21Short"); --> needed in GEMSegmentBuilder.cc
@@ -286,7 +287,7 @@ GEMSegAlgoPV::chainHits(const EnsembleHitContainer& rechits) {
 
 bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const EnsembleHitContainer& oldChain) {
 
-  std::vector<float> phi_new, eta_new, phi_old, eta_old;
+  std::vector<float> phi_new, eta_new, time_new, phi_old, eta_old, time_old;
   std::vector<int> layer_new, layer_old;
   // std::vector< std::vector<int> > layer_new, layer_old;
   std::vector<int> bx_new, bx_old;
@@ -311,6 +312,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
     // std::vector<int> layer_tmp; layer_tmp.push_back((rhID.station()-1)*2+rhID.layer()); layer_new.push_back(layer_tmp);
     phi_new.push_back(rhGP_inCMSFrame.phi());
     eta_new.push_back(rhGP_inCMSFrame.eta());
+    time_new.push_back(newChain[iRH_new]->tof());
     bx_new.push_back(newChain[iRH_new]->BunchX());
     // Log Message
     #ifdef EDM_ML_DEBUG // have lines below only compiled when in debug mode
@@ -318,6 +320,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
     LocalPoint rhLP_inChamberFrame = rhCH->toLocal(rhGP_inCMSFrame);
     edm::LogVerbatim("GEMSegAlgoPV") << "[GoodToMerge::New Chain][RecHit :: Loc x = "<<std::showpos<<std::setw(9)<<rhLP_inChamberFrame.x()<<" Loc y = "<<std::showpos<<std::setw(9)<<rhLP_inChamberFrame.y()
     			             << " -- Glob eta = "<<std::showpos<<std::setw(9)<<rhGP_inCMSFrame.eta()<<" Glob phi = "<<std::showpos<<std::setw(9)<<rhGP_inCMSFrame.phi()
+                                     << " -- Time = "<<newChain[iRH_new]->tof()
                                      << " -- BX = "<<newChain[iRH_new]->BunchX()
    	                 	     << " -- "<<rhID.rawId()<<" = "<<rhID<<" ]";
     #endif
@@ -334,6 +337,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
     // std::vector<int> layer_tmp; layer_tmp.push_back((rhID.station()-1)*2+rhID.layer()); layer_old.push_back(layer_tmp);
     phi_old.push_back(rhGP_inCMSFrame.phi());
     eta_old.push_back(rhGP_inCMSFrame.eta());
+    time_old.push_back(oldChain[iRH_old]->tof());
     bx_old.push_back(oldChain[iRH_old]->BunchX());
     // Log Message
     #ifdef EDM_ML_DEBUG // have lines below only compiled when in debug mode
@@ -341,6 +345,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
     LocalPoint rhLP_inChamberFrame = rhCH->toLocal(rhGP_inCMSFrame);
     edm::LogVerbatim("GEMSegAlgoPV") << "[GoodToMerge::Old Chain][RecHit :: Loc x = "<<std::showpos<<std::setw(9)<<rhLP_inChamberFrame.x()<<" Loc y = "<<std::showpos<<std::setw(9)<<rhLP_inChamberFrame.y()
                                      << " -- Glob eta = "<<std::showpos<<std::setw(9)<<rhGP_inCMSFrame.eta()<<" Glob phi = "<<std::showpos<<std::setw(9)<<rhGP_inCMSFrame.phi()
+                                     << " -- Time = "<<oldChain[iRH_old]->tof()
                                      << " -- BX = "<<oldChain[iRH_old]->BunchX()
                                      << " -- "<<rhID.rawId()<<" = "<<rhID<<" ]";
     #endif
@@ -349,8 +354,10 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
   // Different Requirements: 
   bool phiRequirementOK   = false; // once it is true in the loop, it is ok to merge
   bool etaRequirementOK   = false; // once it is true in the loop, it is ok to merge
+  bool timeRequirementOK  = false; // once it is true in the loop, it is ok to merge
   bool bxRequirementOK    = false; // once it is true in the loop, it is ok to merge
   bool layerRequirementOK = true;  // once it is false in the loop, it is not ok to merge
+  
 
   for(size_t jRH_new = 0; jRH_new<phi_new.size(); ++jRH_new){
     for(size_t jRH_old = 0; jRH_old<phi_old.size(); ++jRH_old){
@@ -360,7 +367,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
       // allow only change false --> true. once true, leave it true
       if(phiRequirementOK==false) phiRequirementOK = std::abs(reco::deltaPhi(phi_new[jRH_new],phi_old[jRH_old])) < dPhiChainBoxMax;
       if(etaRequirementOK==false) etaRequirementOK = fabs(eta_new[jRH_new]-eta_old[jRH_old]) < dEtaChainBoxMax;
-
+      if(timeRequirementOK==false) timeRequirementOK = fabs(time_new[jRH_new]-time_old[jRH_old]) < dTimeChainBoxMax;
       // Layers
       // hits on the same layer should not be allowed ==> if abs(layer_new - layer_old) > 0 is ok. if = 0 is false
       // allow only change true --> false. once false, leave it false
@@ -379,7 +386,7 @@ bool GEMSegAlgoPV::isGoodToMerge(const EnsembleHitContainer& newChain, const Ens
 	}
       }
 
-      if(layerRequirementOK && phiRequirementOK && etaRequirementOK && bxRequirementOK){
+      if(layerRequirementOK && phiRequirementOK && etaRequirementOK && bxRequirementOK && timeRequirementOK){
 	edm::LogVerbatim("GEMSegAlgoPV") << "[GoodToMerge:: true]";
 	return true; // problem is that return is already given before the second element of the vector old_chain or new_chain is tested ... this logic needs to be changed	
       } 
@@ -426,7 +433,7 @@ std::vector<GEMSegment> GEMSegAlgoPV::buildSegments(const EnsembleHitContainer& 
     auto rhLP = (*rh)->localPosition();
     // auto rhGP = rhr->toGlobal(rhLP);
     edm::LogVerbatim("GEMSegAlgoPV") << "[RecHit :: Loc x = "<<std::showpos<<std::setw(9)<<rhLP.x()<<" Loc y = "<<std::showpos<<std::setw(9)<<rhLP.y()
-				     <<" BX = "<<std::showpos<<(*rh)->BunchX()<<" -- "<<gemid.rawId()<<" = "<<gemid<<" ]";
+				     <<" Time = "<<std::showpos<<(*rh)->tof() <<" BX = "<<std::showpos<<(*rh)->BunchX()<<" -- "<<gemid.rawId()<<" = "<<gemid<<" ]";
   }
   #endif
 
@@ -452,6 +459,22 @@ std::vector<GEMSegment> GEMSegAlgoPV::buildSegments(const EnsembleHitContainer& 
     bx += (*rh)->BunchX();
   }
   if(rechits.size() != 0) bx=bx*1.0/(rechits.size());
+
+  // Calculate the central value and uncertainty of the segment time
+  float averageTime=0.;
+  for (auto rh=rechits.begin(); rh!=rechits.end(); ++rh){
+    averageTime += (*rh)->tof();                                          
+  }
+  if(rechits.size() != 0) averageTime=averageTime/(rechits.size());
+  edm::LogVerbatim("GEMSegAlgoPV") << "[GEMSegAlgoPV::buildSegments] GEMSegment timing :: average time of segments = "<<averageTime;
+
+  float timeUncrt=0.;
+  for (auto rh=rechits.begin(); rh!=rechits.end(); ++rh){
+    timeUncrt += pow((*rh)->tof()-averageTime,2);
+  }
+  if(rechits.size() > 1) timeUncrt=timeUncrt/(rechits.size()-1);
+  timeUncrt = sqrt(timeUncrt);
+  edm::LogVerbatim("GEMSegAlgoPV") << "[GEMSegAlgoPV::buildSegments] GEMSegment timing :: time uncrt of segments = "<<timeUncrt;
 
   // Calculate the central value and uncertainty of the segment time
   // if we want to study impact of 2-3ns time resolution on GEM Segment 
@@ -480,7 +503,7 @@ std::vector<GEMSegment> GEMSegAlgoPV::buildSegments(const EnsembleHitContainer& 
   // save all information inside GEMCSCSegment
   edm::LogVerbatim("GEMSegAlgoPV") << "[GEMSegAlgoPV::buildSegments] will now wrap fit info in GEMSegment dataformat";
   // GEMSegment tmp(proto_segment, protoIntercept, protoDirection, protoErrors, protoChi2);
-  GEMSegment tmp(proto_segment, protoIntercept, protoDirection, protoErrors, protoChi2, bx);
+  GEMSegment tmp(proto_segment, protoIntercept, protoDirection, protoErrors, protoChi2, bx, averageTime,timeUncrt);
   // GEMSegment tmp(proto_segment, protoIntercept, protoDirection, protoErrors, protoChi2, averageTime, timeUncrt);
 
   edm::LogVerbatim("GEMSegAlgoPV") << "[GEMSegAlgoPV::buildSegments] GEMSegment made in "<<tmp.gemDetId();
