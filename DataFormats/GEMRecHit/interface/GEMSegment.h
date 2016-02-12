@@ -25,13 +25,13 @@ public:
 	
     /// Constructor
     GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, LocalPoint origin, 
-	       LocalVector direction, AlgebraicSymMatrix errors, double chi2);
+      LocalVector direction, AlgebraicSymMatrix errors, double chi2);
 
     GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, LocalPoint origin, 
 	       LocalVector direction, AlgebraicSymMatrix errors, double chi2, float bx);
 
     GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, LocalPoint origin, 
-	      LocalVector direction, AlgebraicSymMatrix errors, double chi2, double time, double timeErr);
+      LocalVector direction, AlgebraicSymMatrix errors, double chi2, float bx, double averageTime, double timeUncrt);
   
     /// Destructor
     virtual ~GEMSegment();
@@ -109,9 +109,10 @@ public:
     LocalVector theLocalDirection;   // in chamber frame - the GeomDet local coordinate system
     AlgebraicSymMatrix theCovMatrix; // the covariance matrix
     double theChi2;                  // the Chi squared of the segment fit
+    float  theBX;                    // the bunch crossing
     double theTimeValue;             // the best time estimate of the segment
     double theTimeUncrt;             // the uncertainty on the time estimation
-    float  theBX;                    // the bunch crossing
+
 };
 
 std::ostream& operator<<(std::ostream& os, const GEMSegment& seg);
