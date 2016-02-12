@@ -52,7 +52,7 @@ edm::OwnVector<GEMRecHit> GEMRecHitBaseAlgoPreReco::reconstruct(const GEMDetId& 
     if (recOnlyPrompt && !digi->prompt()) continue;
    std::cout << "digi prompt and recoOnlyPrompt" << std::endl;
 
-    GEMRecHit* recHit = new GEMRecHit(gemId,digi->tof());
+    GEMRecHit* recHit = new GEMRecHit(gemId,digi->tof(),point,tmpErr);
     result.push_back(recHit);
     std::cout << "rec hit result " << std::endl;
   }
