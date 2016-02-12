@@ -42,7 +42,7 @@ GEMSegment::GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, Local
 	LocalVector direction, AlgebraicSymMatrix errors, double chi2) :
   RecSegment(buildDetId(proto_segment.front()->gemId())), 
   theOrigin(origin), 
-  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2){
+  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2) {
   theTimeValue = 0.0;
   theTimeUncrt = 0.0;
   theBX = -10.0;
@@ -50,11 +50,12 @@ GEMSegment::GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, Local
     theGEMRecHits.push_back(*proto_segment[i]);
 }
 
+
 GEMSegment::GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, LocalPoint origin, 
 		       LocalVector direction, AlgebraicSymMatrix errors, double chi2, float bx) : 
   RecSegment(buildDetId(proto_segment.front()->gemId())),
   theOrigin(origin), 
-  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2){
+  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2), theBX(bx) {
   theTimeValue = 0.0;
   theTimeUncrt = 0.0;
   theBX = bx;
@@ -62,17 +63,19 @@ GEMSegment::GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, Local
     theGEMRecHits.push_back(*proto_segment[i]);
 }
 
+
 GEMSegment::GEMSegment(const std::vector<const GEMRecHit*>& proto_segment, LocalPoint origin, 
-		       LocalVector direction, AlgebraicSymMatrix errors, double chi2, double time, double timeErr) : 
+		       LocalVector direction, AlgebraicSymMatrix errors, double chi2, float bx, double averageTime, double timeUncrt) : 
   RecSegment(buildDetId(proto_segment.front()->gemId())),
   theOrigin(origin), 
-  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2){
-  theTimeValue = time;
-  theTimeUncrt = timeErr;
-  theBX = -10.0;
+  theLocalDirection(direction), theCovMatrix(errors), theChi2(chi2), theBX(bx), theTimeValue(averageTime), theTimeUncrt(timeUncrt) {
+  theTimeValue = averageTime;
+  theTimeUncrt = timeUncrt;
+  theBX = bx;
   for(unsigned int i=0; i<proto_segment.size(); ++i)
     theGEMRecHits.push_back(*proto_segment[i]);
 }
+
 
 GEMSegment::~GEMSegment() {}
 
