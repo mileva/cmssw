@@ -10,7 +10,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'file:out_local_reco.root'
+        'file:/tmp/archie/out_rec_gem.root'
         # 'file:out_local_reco_5000evt.root'
         # 'file:out_local_reco_noise.root'
         # 'file:out_local_reco_alldigitized.root'
@@ -20,7 +20,8 @@ process.source = cms.Source("PoolSource",
 )
 process.output = cms.OutputModule("PoolOutputModule",
     fileName = cms.untracked.string( 
-        'file:out_local_reco_gemsegment.root'
+        'file:/tmp/archie/out_rec_gemSeg.root'
+        #'file:out_local_reco_gemsegment.root'
         # 'file:out_local_reco_gemsegment_5000evt.root'
         # 'file:out_local_reco_noise_gemsegment.root'
         # 'file:out_local_reco_test_gemsegment.root'
@@ -44,9 +45,12 @@ process.load('Configuration.EventContent.EventContent_cff')
 # process.load('Configuration.Geometry.GeometryExtended2019_cff')
 # process.load('Configuration.Geometry.GeometryExtended2023Reco_cff')
 # process.load('Configuration.Geometry.GeometryExtended2023_cff')
-process.load('Configuration.Geometry.GeometryExtended2015MuonGEMDevReco_cff')
-process.load('Configuration.Geometry.GeometryExtended2015MuonGEMDev_cff')
-process.load('Configuration.StandardSequences.MagneticField_cff')
+#process.load('Configuration.Geometry.GeometryExtended2015MuonGEMDevReco_cff')
+#process.load('Configuration.Geometry.GeometryExtended2015MuonGEMDev_cff')
+process.load('Configuration.Geometry.GeometryExtended2023MuonReco_cff')
+process.load('Configuration.Geometry.GeometryExtended2023Muon_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_PostLS1_cff')
+#process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
@@ -58,10 +62,10 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 # from Configuration.AlCa.GlobalTag import GlobalTag
 # process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 
 process.load('RecoLocalMuon.GEMSegment.gemSegments_cfi')
-
+process.load('RecoLocalMuon.GEMSegment.gemPreSegments_cfi')
 ### TO ACTIVATE LogTrace IN GEMSegment NEED TO COMPILE IT WITH:
 ### -----------------------------------------------------------
 ### --> scram b -j8 USER_CXXFLAGS="-DEDM_ML_DEBUG"             
@@ -97,7 +101,8 @@ process.MessageLogger.cout = cms.untracked.PSet(
 
 ### Paths and Schedules
 #######################
-process.gemsegment_step  = cms.Path(process.gemSegments)
+process.gemsegment_step  = cms.Path(process.gemSegments*process.gemPreSegments)
+#process.gemsegment_step  = cms.Path(process.gemSegments)
 process.endjob_step  = cms.Path(process.endOfProcess)
 process.out_step     = cms.EndPath(process.output)
 
