@@ -143,24 +143,26 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
     if (simulateElectronBkg_) {
      double averageElectronRatePerRoll = 0.0;
 
-       if (gemId.station() == 1) {
-          averageElectronRatePerRoll = GE11ElecBkgParam0 + GE11ElecBkgParam1 * rollRadius
-          + GE11ElecBkgParam2 * rollRadius * rollRadius + GE11ElecBkgParam3 * rollRadius * rollRadius * rollRadius;
+     float myRandY = flat2_->fire(0., 1.);
+     float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
+     double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
+
+     // max length in x for given y coordinate (cfr trapezoidal eta partition)
+     double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
+            
+
+      if (gemId.station() == 1) {
+          averageElectronRatePerRoll = GE11ElecBkgParam0 + GE11ElecBkgParam1 * yy_glob
+          + GE11ElecBkgParam2 * yy_glob * yy_glob + GE11ElecBkgParam3 * yy_glob * yy_glob * yy_glob;
        }
        if (gemId.station() == 2 || gemId.station() == 3){
-       averageElectronRatePerRoll = constElecGE21 * TMath::Exp(slopeElecGE21 * rollRadius);
+       averageElectronRatePerRoll = constElecGE21 * TMath::Exp(slopeElecGE21 * yy_glob);
        }
 
       // Rate [Hz/cm^2] * 25*10^-9 [s] * Area [cm] = # hits in this roll 
       const double averageElecRate(averageElectronRatePerRoll * (bxwidth*1.0e-9) * trArea);
       int n_elechits(poisson_->fire(averageElecRate));
 
-      float myRandY = flat2_->fire(0., 1.);
-      float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
-      //double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
-
-      // max length in x for given y coordinate (cfr trapezoidal eta partition)
-      double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
                    
       // loop over amount of electron hits in this roll
       for (int i = 0; i < n_elechits; ++i) {
