@@ -11,7 +11,7 @@
 #include <cmath>
 #include <utility>
 #include <map>
-
+#include "TMath.h"
 
 const double cspeed = 29.9792458; // [cm/ns]
 const int bxwidth   = 25;         // [ns]
@@ -30,20 +30,35 @@ GEMPreRecoGaussianModel::GEMPreRecoGaussianModel(const edm::ParameterSet& config
     // averageNoiseRate_(config.getParameter<double>("averageNoiseRate")), 
     simulateElectronBkg_(config.getParameter<bool>("simulateElectronBkg")), 
     simulateNeutralBkg_(config.getParameter<bool>("simulateNeutralBkg")), 
+    doBkgNoise_(config.getParameter<bool>("doBkgNoise")),
     minBunch_(config.getParameter<int>("minBunch")), 
     maxBunch_(config.getParameter<int>("maxBunch"))
 {
-  // polynomial parametrisation of neutral (n+g) and electron background
-  // neuBkg.push_back(899644.0);     neuBkg.push_back(-30841.0);     neuBkg.push_back(441.28); 
-  // neuBkg.push_back(-3.3405);      neuBkg.push_back(0.0140588);    neuBkg.push_back(-3.11473e-05); neuBkg.push_back(2.83736e-08);
-  // eleBkg.push_back(4.68590e+05);  eleBkg.push_back(-1.63834e+04); eleBkg.push_back(2.35700e+02);
-  // eleBkg.push_back(-1.77706e+00); eleBkg.push_back(7.39960e-03);  eleBkg.push_back(-1.61448e-05); eleBkg.push_back(1.44368e-08);
-  neuBkg.push_back(5.69e+06);     neuBkg.push_back(-293334);     neuBkg.push_back(6279.6);
-  neuBkg.push_back(-71.2928);     neuBkg.push_back(0.452244);    neuBkg.push_back(-0.0015191);  neuBkg.push_back(2.1106e-06);
-  eleBkg.push_back(3.77712e+06);  eleBkg.push_back(-199280);     eleBkg.push_back(4340.69);
-  eleBkg.push_back(-49.922);      eleBkg.push_back(0.319699);    eleBkg.push_back(-0.00108113); eleBkg.push_back(1.50889e-06);
 
+  //initialise parameters from the fit:
+  //params for pol3 model of electron bkg for GE1/1:
+    GE11ElecBkgParam0 = 3402.63;
+    GE11ElecBkgParam1 = -42.9979;
+    GE11ElecBkgParam2 = 0.188475;
+    GE11ElecBkgParam3 = -0.0002822;
+  //params for expo model of electron bkg for GE2/1:
+    constElecGE21 = 9.74156e+02;
+    slopeElecGE21 = -1.18398e-02;
+
+  //Neutral Bkg
+  //High Rate model L=5x10^{34}cm^{-2}s^{-1}
+  //params for expo model of neutral bkg for GE1/1:
+    constNeuGE11_highRate = 1.02603e+04;
+    slopeNeuGE11_highRate = -1.62806e-02;
+  //params for pol5 model of neutral bkg for GE2/1:
+    GE21ModNeuBkgParam0 = 21583.2;
+    GE21ModNeuBkgParam1 = -476.59;
+    GE21ModNeuBkgParam2 = 4.24037;
+    GE21ModNeuBkgParam3 = -0.0185558;
+    GE21ModNeuBkgParam4 = 3.97809e-05;
+    GE21ModNeuBkgParam5 = -3.34575e-08;
 }
+
 GEMPreRecoGaussianModel::~GEMPreRecoGaussianModel()
 {
   if (flat1_)   delete flat1_;
@@ -90,10 +105,13 @@ void GEMPreRecoGaussianModel::simulateSignal(const GEMEtaPartition* roll, const 
   }
 }
 
-/*
+
 void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 {
-  double trArea(0.0);
+ if (!doBkgNoise_)
+    return;
+ const GEMDetId gemId(roll->id()); 
+ double trArea(0.0);
 
   // Extract detailed information from the Strip Topology:
   // base_bottom, base_top, height, strips, pads 
@@ -123,23 +141,27 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
     // 2a) electron background
     // -----------------------
     if (simulateElectronBkg_) {
+     double averageElectronRatePerRoll = 0.0;
+
+       if (gemId.station() == 1) {
+          averageElectronRatePerRoll = GE11ElecBkgParam0 + GE11ElecBkgParam1 * rollRadius
+          + GE11ElecBkgParam2 * rollRadius * rollRadius + GE11ElecBkgParam3 * rollRadius * rollRadius * rollRadius;
+       }
+       if (gemId.station() == 2 || gemId.station() == 3){
+       averageElectronRatePerRoll = constElecGE21 * TMath::Exp(slopeElecGE21 * rollRadius);
+       }
+
+      // Rate [Hz/cm^2] * 25*10^-9 [s] * Area [cm] = # hits in this roll 
+      const double averageElecRate(averageElectronRatePerRoll * (bxwidth*1.0e-9) * trArea);
+      int n_elechits(poisson_->fire(averageElecRate));
 
       float myRandY = flat2_->fire(0., 1.);
       float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
-      double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
-
-      // Extract / Calculate the Average Electron Rate 
-      // for the given global Y coord from Parametrization
-      double averageElectronRatePerRoll = 0.0;
-      for(int j=0; j<7; ++j) { averageElectronRatePerRoll += eleBkg[j]*pow(yy_glob,j); }
-
-      // Rate [Hz/cm^2] * 25*10^-9 [s] * Area [cm] = # hits in this roll 
-      const double averageElecRate(averageElectronRatePerRoll * (bxwidth*1.0e-9) * trArea); 
-      int n_elechits(poisson_->fire(averageElecRate));
+      //double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
 
       // max length in x for given y coordinate (cfr trapezoidal eta partition)
       double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
-
+                   
       // loop over amount of electron hits in this roll
       for (int i = 0; i < n_elechits; ++i) {
 	//calculate xx_rand at a given yy_rand
@@ -156,11 +178,16 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 	int pdgid = 0;
 	if (myrandP <= 0.5) pdgid = -11; // electron
 	else 	            pdgid = 11;  // positron
-	GEMDigiPreReco digi(xx_rand, yy_rand, ex, ey, corr, time, pdgid);
+	GEMDigiPreReco digi(xx_rand, yy_rand, ex, ey, corr, time, pdgid, 0);
 	digi_.insert(digi);
-      }
-    }
 
+        //edm::LogVerbatim("GEMPreRecoGaussianModelNoise") << "[GEMPreRecoDigi :: simulateNoise :: ele bkg] :: electron hit in "<<roll->id()<<" pdgid = "<<pdgid<<" bx = "<<bx<<" ==> digitized at loc x = "<<xx_rand<<" loc y = "<<yy_rand<<" time = "<<time<<" [ns]";
+
+      }  ///////for (int i = 0; i < n_elechits; ++i)
+    }  ////if (simulateElectronBkg_)
+
+
+/*
     // 2b) neutral (n+g) background
     // ----------------------------
     if (simulateNeutralBkg_) {
@@ -201,7 +228,6 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
         digi_.insert(digi);
       }
     }
-
-  } // end loop over bx
-}
 */
+  } // end loop over bx
+}  // end loop on void class
