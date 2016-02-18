@@ -12,6 +12,7 @@ simMuonME0Digis = cms.EDProducer("ME0DigiPreRecoProducer",
     averageEfficiency = cms.double(0.98),
     digitizeOnlyMuons = cms.bool(False),
     gaussianSmearing = cms.bool(True),
+    doBkgNoise = cms.bool(True), #False == No background simulation
     # simulateIntrinsicNoise = cms.bool(False), # intrinsic noise --> not implemented
     # averageNoiseRate = cms.double(0.001),     # intrinsic noise --> not implemented
     simulateElectronBkg = cms.bool(True),       # True - will simulate electron background
