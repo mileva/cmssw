@@ -111,7 +111,7 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
  if (!doBkgNoise_)
     return;
  const GEMDetId gemId(roll->id()); 
- double trArea(0.0);
+ //double trArea(0.0);
 
   // Extract detailed information from the Strip Topology:
   // base_bottom, base_top, height, strips, pads 
@@ -124,10 +124,31 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
   float height(parameters[2]);       height       = 2*height;
   float myTanPhi    = (topLength - bottomLength) / (height * 2);
   double rollRadius = top_->radius();
-  trArea = height * (topLength + bottomLength) / 2.0;
+  //trArea = height * (topLength + bottomLength) / 2.0;
+
+  // Divide the detector area in different strips
+  // take smearing in y-coord as height for each strip
+  double heightIt = sigma_v;
+  int heightbins  = height/heightIt; // round down
+
+  for(int hx=0; hx<heightbins; ++hx) {
+     double bottomIt = bottomLength +  hx  *2*tan(10./180*3.14)*heightIt;
+     double topIt    = bottomLength + (hx+1)*2*tan(10./180*3.14)*heightIt; 
+     if(hx==heightbins-1) {
+      topIt = topLength; // last bin ... make strip a bit larger to cover entire roll
+      heightIt = height-hx*heightIt;
+     }
+   double areaIt   = heightIt*(bottomIt+topIt)*1.0/2;
+   double myRandY = flat1_->fire(0., 1.);
+   double y0_rand = (hx+myRandY)*heightIt;  // Y coord, measured from the bottom of the roll
+   double yy_rand = (y0_rand-height*1.0/2); // Y coord, measured from the middle of the roll, which is the Y coord in Local Coords
+   double yy_glob = rollRadius + yy_rand;   // R coord in Global Coords
+
+  // max length in x for given y coordinate (cfr trapezoidal eta partition)
+   double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
 
   // simulate intrinsic noise and background hits in all BX that are being read out
-  for(int bx=minBunch_; bx<maxBunch_+1; ++bx) {
+  //for(int bx=minBunch_; bx<maxBunch_+1; ++bx) {
 
     // 1) Intrinsic Noise ... Not implemented right now
     // ------------------------------------------------
@@ -143,12 +164,12 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
     if (simulateElectronBkg_) {
      double averageElectronRatePerRoll = 0.0;
 
-     float myRandY = flat2_->fire(0., 1.);
-     float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
-     double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
+    // float myRandY = flat2_->fire(0., 1.);
+    // float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
+    // double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
 
      // max length in x for given y coordinate (cfr trapezoidal eta partition)
-     double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
+    // double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
             
 
       if (gemId.station() == 1) {
@@ -160,18 +181,29 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
        }
 
       // Rate [Hz/cm^2] * 25*10^-9 [s] * Area [cm] = # hits in this roll 
-      const double averageElecRate(averageElectronRatePerRoll * (bxwidth*1.0e-9) * trArea);
-      int n_elechits(poisson_->fire(averageElecRate));
+      //const double averageElecRate(averageElectronRatePerRoll * (bxwidth*1.0e-9) * trArea);
+      //int n_elechits(poisson_->fire(averageElecRate));
+      const double averageElecRate(averageElectronRatePerRoll * (maxBunch_-minBunch_+1)*(bxwidth*1.0e-9) * areaIt);
 
-                   
+      // to be fixed ... averageElecRate should be normalized ...
+      // what if averageElecRate > 1?
+      // what if max averageElecRate < 1 
+
+      bool ele_eff = (flat1_->fire(0., 1.)<averageElecRate)?1:0; 
+
+                 
       // loop over amount of electron hits in this roll
-      for (int i = 0; i < n_elechits; ++i) {
+      //for (int i = 0; i < n_elechits; ++i) {
+      if(ele_eff) {
 	//calculate xx_rand at a given yy_rand
 	float myRandX = flat1_->fire(0., 1.);
 	float xx_rand = 2 * xMax * (myRandX - 0.5);
 	float ex = sigma_u;
 	float ey = sigma_v;
 	float corr = 0.;
+        // extract random BX
+        double myrandBX = flat1_->fire(0., 1.);
+	int bx = int((maxBunch_-minBunch_+1)*myrandBX)+minBunch_;
 	// extract random time in this BX
 	float myrandT = flat1_->fire(0., 1.);
 	float minBXtime = (bx-0.5)*bxwidth;      // float maxBXtime = (bx+0.5)*bxwidth;
@@ -185,7 +217,7 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 
         //edm::LogVerbatim("GEMPreRecoGaussianModelNoise") << "[GEMPreRecoDigi :: simulateNoise :: ele bkg] :: electron hit in "<<roll->id()<<" pdgid = "<<pdgid<<" bx = "<<bx<<" ==> digitized at loc x = "<<xx_rand<<" loc y = "<<yy_rand<<" time = "<<time<<" [ns]";
 
-      }  ///////for (int i = 0; i < n_elechits; ++i)
+      }  ///////if(ele_eff) 
     }  ////if (simulateElectronBkg_)
 
 
@@ -231,5 +263,5 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
       }
     }
 */
-  } // end loop over bx
+  } //for(int hx=0; hx<heightbins; ++hx) 
 }  // end loop on void class
