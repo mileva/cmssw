@@ -23,7 +23,7 @@ public:
 
   void setRandomEngine(CLHEP::HepRandomEngine&) {}
 
-//  void simulateNoise(const GEMEtaPartition*);   // to be added later
+  void simulateNoise(const GEMEtaPartition*);   
 
   void setup() {}
 
