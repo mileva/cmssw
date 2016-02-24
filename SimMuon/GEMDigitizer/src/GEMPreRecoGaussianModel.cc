@@ -221,35 +221,51 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
     }  ////if (simulateElectronBkg_)
 
 
-/*
+
     // 2b) neutral (n+g) background
     // ----------------------------
     if (simulateNeutralBkg_) {
 
-      float myRandY = flat2_->fire(0., 1.);
-      float yy_rand = height * (myRandY - 0.5); // random Y coord in Local Coords
-      double yy_glob = rollRadius + yy_rand;    // random Y coord in Global Coords
 
       // Extract / Calculate the Average Electron Rate 
       // for the given global Y coord from Parametrization
-      double averageNeutralRatePerRoll = 0.0;
-      for(int j=0; j<7; ++j) { averageNeutralRatePerRoll += neuBkg[j]*pow(yy_glob,j); }
 
+      double averageNeutralRatePerRoll = 0.0;
+      if (gemId.station() == 1)
+      {
+      averageNeutralRatePerRoll = constNeuGE11_highRate * TMath::Exp(slopeNeuGE11_highRate * rollRadius);
+      }
+
+      if (gemId.station() == 2 || gemId.station() == 3)
+      {
+      averageNeutralRatePerRoll = GE21ModNeuBkgParam0 + GE21ModNeuBkgParam1 * rollRadius
+          + GE21ModNeuBkgParam2 * rollRadius * rollRadius + GE21ModNeuBkgParam3 * rollRadius * rollRadius * rollRadius
+          + GE21ModNeuBkgParam4 * rollRadius * rollRadius * rollRadius * rollRadius
+          + GE21ModNeuBkgParam5 * rollRadius * rollRadius * rollRadius * rollRadius * rollRadius;
+      }
+  
       // Rate [Hz/cm^2] * 25*10^-9 [s] * Area [cm] = # hits in this roll
-      const double averageNeutrRate(averageNeutralRatePerRoll * (bxwidth*1.0e-9) * trArea);
-      int n_hits(poisson_->fire(averageNeutrRate));
+      //const double averageNeutrRate(averageNeutralRatePerRoll * (bxwidth*1.0e-9) * trArea);
+      //int n_hits(poisson_->fire(averageNeutrRate));
+      const double averageNeutrRate(averageNeutralRatePerRoll * (maxBunch_-minBunch_+1)*(bxwidth*1.0e-9) * areaIt);
 
       // max length in x for given y coordinate (cfr trapezoidal eta partition)
-      double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
+      //double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
+
+      bool neu_eff = (flat1_->fire(0., 1.)<averageNeutrRate)?1:0;
 
       // loop over amount of neutral hits in this roll
-      for (int i = 0; i < n_hits; ++i) {
+      //for (int i = 0; i < n_hits; ++i) {
+      if(neu_eff) {
 	//calculate xx_rand at a given yy_rand
 	float myRandX = flat1_->fire(0., 1.);
 	float xx_rand = 2 * xMax * (myRandX - 0.5);
 	float ex = sigma_u;
 	float ey = sigma_v;
 	float corr = 0.;
+        // extract random BX
+        double myrandBX= flat1_->fire(0., 1.);
+        int bx = int((maxBunch_-minBunch_+1)*myrandBX)+minBunch_;
 	// extract random time in this BX
         float myrandT = flat1_->fire(0., 1.);
         float minBXtime = (bx-0.5)*bxwidth;
@@ -258,10 +274,10 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
         float myrandP = flat1_->fire(0., 1.);
         if (myrandP <= 0.08) pdgid = 2112; // neutrons: GEM sensitivity for neutrons: 0.08%
         else                 pdgid = 22;   // photons:  GEM sensitivity for photons:  1.04% ==> neutron fraction = (0.08 / 1.04) = 0.077 = 0.08
-        GEMDigiPreReco digi(xx_rand, yy_rand, ex, ey, corr, time, pdgid);
+        GEMDigiPreReco digi(xx_rand, yy_rand, ex, ey, corr, time, pdgid, 0);
         digi_.insert(digi);
-      }
-    }
-*/
+      } ///if(neu_eff)
+    }   ///if (simulateNeutralBkg_)
+
   } //for(int hx=0; hx<heightbins; ++hx) 
 }  // end loop on void class

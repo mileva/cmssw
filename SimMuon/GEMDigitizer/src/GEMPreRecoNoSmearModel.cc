@@ -37,11 +37,11 @@ GEMPreRecoNoSmearModel::simulateSignal(const GEMEtaPartition* roll,
   }
 }
 
-/*
+
 void 
 GEMPreRecoNoSmearModel::simulateNoise(const GEMEtaPartition* roll)
 {
 }
-*/
+
 
 
