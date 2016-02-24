@@ -37,7 +37,7 @@ GEMPreRecoNoSmearModel::simulateSignal(const GEMEtaPartition* roll,
   }
 }
 
-
+//adding background hits in digitization
 void 
 GEMPreRecoNoSmearModel::simulateNoise(const GEMEtaPartition* roll)
 {

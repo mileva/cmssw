@@ -13,7 +13,7 @@
 #include <map>
 #include "TMath.h"
 
-const double cspeed = 29.9792458; // [cm/ns]
+//const double cspeed = 29.9792458; // [cm/ns]
 const int bxwidth   = 25;         // [ns]
 
 GEMPreRecoGaussianModel::GEMPreRecoGaussianModel(const edm::ParameterSet& config) :

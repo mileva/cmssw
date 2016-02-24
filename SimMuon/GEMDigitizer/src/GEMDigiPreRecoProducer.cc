@@ -84,6 +84,7 @@ void GEMDigiPreRecoProducer::produce(edm::Event& e, const edm::EventSetup& event
       << "GEMDigiPreRecoProducer: found " << simHits.size() << " hit(s) in eta partition" << rawId;
     
     gemDigiPreRecoModel_->simulateSignal(roll, simHits);
+//adding background hits in digitization 
     gemDigiPreRecoModel_->simulateNoise(roll); 
     gemDigiPreRecoModel_->fillDigis(rawId, *digis);
   }
