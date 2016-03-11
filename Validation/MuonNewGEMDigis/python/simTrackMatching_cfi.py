@@ -34,15 +34,15 @@ SimTrackMatching = cms.PSet(
         maxBX = cms.int32(1),
         matchDeltaStrip = cms.int32(1),
     ),
-    me0RecHit = cms.PSet(
+    gemRecHit = cms.PSet(
         verbose = cms.int32(0),
-        input = cms.InputTag('me0RecHits'),
+        input = cms.InputTag('gemRecHitsPreReco'),
         simMuOnly = cms.bool(True),
         discardEleHits = cms.bool(True),
     ),
-    me0Seg = cms.PSet(
+    gemSeg = cms.PSet(
         verbose = cms.int32(0),
-        input = cms.InputTag('me0Segments'),
+        input = cms.InputTag('gemPreSegments'),
         simMuOnly = cms.bool(True),
         discardEleHits = cms.bool(True),
     ),
