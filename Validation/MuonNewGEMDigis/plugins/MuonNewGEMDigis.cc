@@ -227,6 +227,7 @@ void
 MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     using namespace edm;
+   
 
     iEvent.getByLabel(simTrackInput_, sim_tracks);
     iEvent.getByLabel(simTrackInput_, sim_vertices);
@@ -249,7 +250,7 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
     {
         if(abs(itHit->particleType()) != 13) continue;
         if(std::find(trackIds.begin(), trackIds.end(), itHit->trackId()) == trackIds.end()) continue;
-
+        
         //std::cout<<"Size "<<trackIds.size()<<" id1 "<<trackIds[0]<<" type1 "<<trackType[0]<<" id2 "<<trackIds[1]<<" type2 "<<trackType[1]<<std::endl;
 
         gem_sh.eventNumber = iEvent.id().event();
@@ -315,6 +316,7 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             for (digiItr = (*cItr ).second.first; digiItr != (*cItr ).second.second; ++digiItr)
             {
 		if(abs(digiItr->pdgid()) != 13) continue;
+
 	        gem_digi_.particleType = digiItr->pdgid();
                 gem_digi_.strip = 0;
                 gem_digi_.bx = 0;
@@ -345,11 +347,10 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                 int la(gem_digi_.layer);
                 int st(gem_digi_.station);
                // int BX(gem_digi_.bx);
-
                 if(gem_digi_.bx != 0) continue;
-                if(isGEMDigiMatched(gem_digi_, gem_sh)){
+                if((isGEMDigiMatched(gem_digi_, gem_sh)) && (digiItr->prompt())){
                     count++;
-                   // std::cout << " bunch crossings == " << BX << std::endl;
+                    //std::cout << " bunch crossings == " << BX << std::endl;
                     std::cout << " GEM station == " << st << std::endl;
                     if(st==3)std::cout << " GEM layer == " << la << std::endl;
                     /*------------zR Occupancy--------------*/
@@ -358,36 +359,57 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                     if(re==1) gemCollection["strip_dg_zr_rp1"]->Fill(gem_digi_.g_z,glb_R);
 
                     /*-------------XY Occupancy---------------*/
-                    if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_l3"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_l4"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_l5"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_l6"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    
+                    if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_st1_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_st1_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_st2_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_st2_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_st3_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_st3_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
 
-                    if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_l3"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_l4"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_l5"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-                    if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_l6"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
-
+                    if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_st1_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_st1_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_st2_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_st2_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_st3_l1"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_st3_l2"]->Fill(gem_digi_.g_x,gem_digi_.g_y);
+                    
                     /*------------ (x_digi_sim - x_digi_rec) ------------*/
                     gemCollection["digiDX"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
 
-                    if(re==-1 && la==1 && st==1) gemCollection["digiDX_rm1_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==-1 && la==2 && st==1) gemCollection["digiDX_rm1_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==-1 && la==1 && st==2) gemCollection["digiDX_rm1_l3"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==-1 && la==2 && st==2) gemCollection["digiDX_rm1_l4"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==-1 && la==1 && st==3) gemCollection["digiDX_rm1_l5"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==-1 && la==2 && st==3) gemCollection["digiDX_rm1_l6"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    
+                    if(re==-1 && la==1 && st==1) gemCollection["digiDX_rm1_st1_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==-1 && la==2 && st==1) gemCollection["digiDX_rm1_st1_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==-1 && la==1 && st==2) gemCollection["digiDX_rm1_st2_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==-1 && la==2 && st==2) gemCollection["digiDX_rm1_st2_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==-1 && la==1 && st==3) gemCollection["digiDX_rm1_st3_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==-1 && la==2 && st==3) gemCollection["digiDX_rm1_st3_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
 
-                    if(re==1 && la==1 && st==1) gemCollection["digiDX_rp1_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==1 && la==2 && st==1) gemCollection["digiDX_rp1_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==1 && la==1 && st==2) gemCollection["digiDX_rp1_l3"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==1 && la==2 && st==2) gemCollection["digiDX_rp1_l4"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==1 && la==1 && st==3) gemCollection["digiDX_rp1_l5"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
-                    if(re==1 && la==2 && st==3) gemCollection["digiDX_rp1_l6"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==1 && st==1) gemCollection["digiDX_rp1_st1_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==2 && st==1) gemCollection["digiDX_rp1_st1_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==1 && st==2) gemCollection["digiDX_rp1_st2_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==2 && st==2) gemCollection["digiDX_rp1_st2_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==1 && st==3) gemCollection["digiDX_rp1_st3_l1"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    if(re==1 && la==2 && st==3) gemCollection["digiDX_rp1_st3_l2"]->Fill(gem_digi_.g_x_sim-gem_digi_.g_x);
+                    
+                   /*------------ (phi_digi_sim - phi_digi_rec) ------------*/
+                    gemCollection["digiDPhi"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                                     
+                    if(re==-1 && la==1 && st==1) gemCollection["digiDPhi_rm1_st1_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==-1 && la==2 && st==1) gemCollection["digiDPhi_rm1_st1_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==-1 && la==1 && st==2) gemCollection["digiDPhi_rm1_st2_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==-1 && la==2 && st==2) gemCollection["digiDPhi_rm1_st2_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==-1 && la==1 && st==3) gemCollection["digiDPhi_rm1_st3_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==-1 && la==2 && st==3) gemCollection["digiDPhi_rm1_st3_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+
+                    if(re==1 && la==1 && st==1) gemCollection["digiDPhi_rp1_st1_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==1 && la==2 && st==1) gemCollection["digiDPhi_rp1_st2_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==1 && la==1 && st==2) gemCollection["digiDPhi_rp1_st2_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==1 && la==2 && st==2) gemCollection["digiDPhi_rp1_st2_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==1 && la==1 && st==3) gemCollection["digiDPhi_rp1_st3_l1"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    if(re==1 && la==2 && st==3) gemCollection["digiDPhi_rp1_st3_l2"]->Fill(gem_digi_.g_phi_sim-gem_digi_.g_phi);
+                    
+
                 }
             }
 
@@ -447,18 +469,26 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                     gemCollection["strip_dg_R_st1_prompt"]->Fill(g_r);
                     gemCollection["strip_dg_st1_prompt_timing"]->Fill(timing);
                   }
-                  else{
+                  if(st==2){
                     gemCollection["strip_dg_R_st2_prompt"]->Fill(g_r);
                     gemCollection["strip_dg_st2_prompt_timing"]->Fill(timing);
+                  }
+                  if(st==3){
+                    gemCollection["strip_dg_R_st3_prompt"]->Fill(g_r);
+                    gemCollection["strip_dg_st3_prompt_timing"]->Fill(timing);
                   }
                   if ( fabs(particleType) == 11 ) {
                      if(st==1){ 
                      gemCollection["strip_dg_R_st1_prompt_e"]->Fill(g_r);
                      gemCollection["strip_dg_st1_prompt_timing_e"]->Fill(timing);
                      }
-                     else{
+                     if(st==2){
                      gemCollection["strip_dg_R_st2_prompt_e"]->Fill(g_r);
                      gemCollection["strip_dg_st2_prompt_timing_e"]->Fill(timing);
+                     }
+                     if(st==3){
+                     gemCollection["strip_dg_R_st3_prompt_e"]->Fill(g_r);
+                     gemCollection["strip_dg_st3_prompt_timing_e"]->Fill(timing);
                      }
                   }
                   if ( fabs(particleType) == 13 ) {
@@ -466,9 +496,13 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                      gemCollection["strip_dg_R_st1_prompt_m"]->Fill(g_r);
                      gemCollection["strip_dg_st1_prompt_timing_m"]->Fill(timing);
                      }
-                     else{
+                     if(st==2){
                      gemCollection["strip_dg_R_st2_prompt_m"]->Fill(g_r);
                      gemCollection["strip_dg_st2_prompt_timing_m"]->Fill(timing);
+                     }
+                     if(st==3){
+                     gemCollection["strip_dg_R_st3_prompt_m"]->Fill(g_r);
+                     gemCollection["strip_dg_st3_prompt_timing_m"]->Fill(timing);
                      }
                   } 
                   if ( !(fabs(particleType) == 11 && fabs(particleType) == 13) )  {
@@ -476,26 +510,33 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                      gemCollection["strip_dg_R_st1_prompt_h"]->Fill(g_r);
                      gemCollection["strip_dg_st1_prompt_timing_h"]->Fill(timing);
                      }
-                     else{
+                     if(st==2){
                      gemCollection["strip_dg_R_st2_prompt_h"]->Fill(g_r);
                      gemCollection["strip_dg_st2_prompt_timing_h"]->Fill(timing);
                      }
+                     if(st==3){
+                     gemCollection["strip_dg_R_st3_prompt_h"]->Fill(g_r);
+                     gemCollection["strip_dg_st3_prompt_timing_h"]->Fill(timing);
+                     }
+  
                   }
-                  gemCollection["strip_dg_zr_prompt"]->Fill(std::fabs(g_z),g_r);
-                  if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_l1_prompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_l2_prompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_l3_prompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_l4_prompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_l5_prompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_l6_prompt"]->Fill(g_x,g_y);
+                 gemCollection["strip_dg_zr_prompt"]->Fill(std::fabs(g_z),g_r);
+                   
+                  if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_st1_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_st1_l2_prompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_st2_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_st2_l2_prompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_st3_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_st3_l2_prompt"]->Fill(g_x,g_y);
 
-                  if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_l1_prompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_l2_prompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_l3_prompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_l4_prompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_l5_prompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_l6_prompt"]->Fill(g_x,g_y);
-                }
+                  if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_st1_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_st1_l2_prompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_st2_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_st2_l2_prompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_st3_l1_prompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_st3_l2_prompt"]->Fill(g_x,g_y);
+                
+                 }
 
             if(!(digiItr->prompt())){
                   if(st==1){
@@ -553,20 +594,22 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
                      }
                   }
                   gemCollection["strip_dg_zr_NoPrompt"]->Fill(std::fabs(g_z),g_r);
-                  if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_l1_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_l2_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_l3_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_l4_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_l5_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_l6_NoPrompt"]->Fill(g_x,g_y);
+                  
+                  if(re==-1 && la==1 && st==1) gemCollection["strip_dg_xy_rm1_st1_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==1) gemCollection["strip_dg_xy_rm1_st1_l2_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==1 && st==2) gemCollection["strip_dg_xy_rm1_st2_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==2) gemCollection["strip_dg_xy_rm1_st2_l2_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==1 && st==3) gemCollection["strip_dg_xy_rm1_st3_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==-1 && la==2 && st==3) gemCollection["strip_dg_xy_rm1_st3_l2_NoPrompt"]->Fill(g_x,g_y);
 
-                  if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_l1_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_l2_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_l3_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_l4_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_l5_NoPrompt"]->Fill(g_x,g_y);
-                  if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_l6_NoPrompt"]->Fill(g_x,g_y);
-                    }
+                  if(re==1 && la==1 && st==1) gemCollection["strip_dg_xy_rp1_st1_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==1) gemCollection["strip_dg_xy_rp1_st1_l2_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==1 && st==2) gemCollection["strip_dg_xy_rp1_st2_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==2) gemCollection["strip_dg_xy_rp1_st2_l2_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==1 && st==3) gemCollection["strip_dg_xy_rp1_st3_l1_NoPrompt"]->Fill(g_x,g_y);
+                  if(re==1 && la==2 && st==3) gemCollection["strip_dg_xy_rp1_st3_l2_NoPrompt"]->Fill(g_x,g_y);
+                        
+              }
 
         }
 
@@ -610,28 +653,36 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
     if(hasGEMGeometry_){
 
         int num_region=2;
-	      int num_layers=6;
+ 	      int num_layers=2;
+                  int num_stations=3;
 
         std::string region[2] ={"m1", "p1"};
-	      std::string layers[6] = {"l1","l2","l3","l4","l5","l6"};
+   	      std::string layers[2] = {"l1","l2"};
+                   std::string stations[3] = {"st1","st2", "st3"};
 
         gemCollection["num_events"]=dbe->book1D("num_events","Number Total Events",3,0,2);
         gemCollection["strip_dg_zr_rm1"]=dbe->book2D("strip_dg_zr_rm1","Digi occupancy: region m1;globalZ [cm];globalR [cm]",80,-555,-515,120,20,160);
         gemCollection["strip_dg_zr_rp1"]=dbe->book2D("strip_dg_zr_rp1","Digi occupancy: region p1;globalZ [cm];globalR [cm]",80,515,555,120,20,160);
         gemCollection["digiDX"]=dbe->book1D("digiDX","x^{digi}_{sim} - x^{digi}_{rec}; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",100,-10,+10);
+        gemCollection["digiDPhi"]=dbe->book1D("digiDPhi","Phi^{digi}_{sim} - Phi^{digi}_{rec}; Phi^{digi}_{sim} - Phi^{digi}_{rec} [rad]; entries",10000,-10,+10);
+ 
 
         for(int k=0;k<num_region;k++){
-          for(int j=0; j<num_layers;j++){
+        
+           for(int m=0;m<num_stations;m++){
+             for(int j=0; j<num_layers;j++){
             //std::cout<<"REGION!!!!!!   "<<region[k]<<std::endl;
 
-            gemCollection["strip_dg_xy_r"+region[k]+"_"+layers[j]+""]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+layers[j]+"","Digi occupancy All: region "+region[k]+", layer "+layers[j]+";globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
-            gemCollection["strip_dg_xy_r"+region[k]+"_"+layers[j]+"_prompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+layers[j]+"_prompt","Digi occupancy Prompt: region "+region[k]+", layer "+layers[j]+";globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
-            gemCollection["strip_dg_xy_r"+region[k]+"_"+layers[j]+"_NoPrompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+layers[j]+"_NoPrompt","Digi occupancy NoPrompt: region "+region[k]+", layer "+layers[j]+";globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
+            gemCollection["strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j],"Digi occupancy All: region "+region[k]+", station "+stations[m]+", layer "+layers[j]+";globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
+            gemCollection["strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_prompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_prompt","Digi occupancy Prompt: region "+region[k]+", station "+stations[m]+", layer "+layers[j]+" ;globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
+            gemCollection["strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_NoPrompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_NoPrompt","Digi occupancy NoPrompt: region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
 
-            gemCollection["digiDX_r"+region[k]+"_"+layers[j]+""]=dbe->book1D("digiDX_r"+region[k]+"_"+layers[j]+"","x^{digi}_{sim} - x^{digi}_{rec} region "+region[k]+", layer "+layers[j]+"; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",100,-10,+10);
+            gemCollection["digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book1D("digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j],"x^{digi}_{sim} - x^{digi}_{rec} region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",100,-10,+10);
+
+           gemCollection["digiDPhi_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book1D("digiDPhi_r"+region[k]+"_"+stations[m]+"_"+layers[j],"Phi^{digi}_{sim} - Phi^{digi}_{rec} region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; Phi^{digi}_{sim} - Phi^{digi}_{rec} [rad]; entries",10000,-10,+10);
             }
 
-
+           }
           }
 
 
@@ -640,27 +691,35 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
         // Prompt particles spectrum Vs R
         gemCollection["strip_dg_R_st1_prompt"]   =dbe->book1D("strip_dg_R_st1_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station 1 ",270,130,400);
         gemCollection["strip_dg_R_st2_prompt"]   =dbe->book1D("strip_dg_R_st2_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station2 ",270,130,400);
+        gemCollection["strip_dg_R_st3_prompt"]   =dbe->book1D("strip_dg_R_st3_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station3 ",270,130,400);
  
        gemCollection["strip_dg_R_st1_prompt_e"]   =dbe->book1D("strip_dg_R_st1_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events: Station 1 ",270,130,400);
        gemCollection["strip_dg_R_st2_prompt_e"]   =dbe->book1D("strip_dg_R_st2_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 2 ",270,130,400);
+       gemCollection["strip_dg_R_st3_prompt_e"]   =dbe->book1D("strip_dg_R_st3_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 3 ",270,130,400);
 
         gemCollection["strip_dg_R_st1_prompt_m"]   =dbe->book1D("strip_dg_R_st1_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 1 ",270,130,400);
         gemCollection["strip_dg_R_st2_prompt_m"]   =dbe->book1D("strip_dg_R_st2_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 2 ",270,130,400);
+        gemCollection["strip_dg_R_st3_prompt_m"]   =dbe->book1D("strip_dg_R_st3_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 3 ",270,130,400);
 
         gemCollection["strip_dg_R_st1_prompt_h"]   =dbe->book1D("strip_dg_R_st1_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 1 ",270,130,400);
         gemCollection["strip_dg_R_st2_prompt_h"]   =dbe->book1D("strip_dg_R_st2_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 2 ",270,130,400);
+        gemCollection["strip_dg_R_st3_prompt_h"]   =dbe->book1D("strip_dg_R_st3_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 3 ",270,130,400);
         // Prompt Timing
         gemCollection["strip_dg_st1_prompt_timing"]    =  dbe->book1D("strip_dg_st1_prompt_timing","Digi Timing Distribution Prompt; time [ns]; Events; Station 1",250,-150,100);
         gemCollection["strip_dg_st2_prompt_timing"]    =  dbe->book1D("strip_dg_st2_prompt_timing","Digi Timing Distribution Prompt; time [ns]; Events; Station 2",250,-150,100);
+        gemCollection["strip_dg_st3_prompt_timing"]    =  dbe->book1D("strip_dg_st3_prompt_timing","Digi Timing Distribution Prompt; time [ns]; Events; Station 3",250,-150,100);
 
         gemCollection["strip_dg_st1_prompt_timing_e"]  =  dbe->book1D("strip_dg_st1_prompt_timing_e","Digi Timing Distribution Prompt electrons; time [ns]; Events; Station 1",250,-150,100);
         gemCollection["strip_dg_st2_prompt_timing_e"]  =  dbe->book1D("strip_dg_st2_prompt_timing_e","Digi Timing Distribution Prompt electrons; time [ns]; Events; Station 2",250,-150,100);
+        gemCollection["strip_dg_st3_prompt_timing_e"]  =  dbe->book1D("strip_dg_st3_prompt_timing_e","Digi Timing Distribution Prompt electrons; time [ns]; Events; Station 3",250,-150,100);
 
         gemCollection["strip_dg_st1_prompt_timing_m"]  =  dbe->book1D("strip_dg_st1_prompt_timing_m","Digi Timing Distribution Prompt muons; time [ns]; Events; Station 1 ",250,-150,100);
         gemCollection["strip_dg_st2_prompt_timing_m"]  =  dbe->book1D("strip_dg_st2_prompt_timing_m","Digi Timing Distribution Prompt muons; time [ns]; Events; Station 2 ",250,-150,100);
+        gemCollection["strip_dg_st3_prompt_timing_m"]  =  dbe->book1D("strip_dg_st3_prompt_timing_m","Digi Timing Distribution Prompt muons; time [ns]; Events; Station 3 ",250,-150,100);
 
         gemCollection["strip_dg_st1_prompt_timing_h"]  =  dbe->book1D("strip_dg_st1_prompt_timing_h","Digi Timing Distribution Prompt hadrons; time [ns]; Events; Station 1",250,-150,100);
         gemCollection["strip_dg_st2_prompt_timing_h"]  =  dbe->book1D("strip_dg_st2_prompt_timing_h","Digi Timing Distribution Prompt hadrons; time [ns]; Events; Station 2",250,-150,100);
+        gemCollection["strip_dg_st3_prompt_timing_h"]  =  dbe->book1D("strip_dg_st3_prompt_timing_h","Digi Timing Distribution Prompt hadrons; time [ns]; Events; Station 3",250,-150,100);
 
         dbe->setCurrentFolder(noPrompt_folder);
         gemCollection["strip_dg_zr_NoPrompt"]=dbe->book2D("strip_dg_zr_NoPrompt","Digi occupancy NoPrompt: region m1;global|Z| [cm];globalR [cm]",80,515,555,120,20,160);
