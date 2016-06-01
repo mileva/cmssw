@@ -20,11 +20,13 @@ GEMPreRecoGaussianModel::GEMPreRecoGaussianModel(const edm::ParameterSet& config
     GEMDigiPreRecoModel(config), 
     sigma_t(config.getParameter<double>("timeResolution")), 
     sigma_u(config.getParameter<double>("phiResolution")), 
+    sigma_u1(config.getParameter<double>("phiResolution1")),
     sigma_v(config.getParameter<double>("etaResolution")), 
     corr(config.getParameter<bool>("useCorrelation")), 
     etaproj(config.getParameter<bool>("useEtaProjectiveGEO")), 
     digitizeOnlyMuons_(config.getParameter<bool>("digitizeOnlyMuons")), 
     gaussianSmearing_(config.getParameter<bool>("gaussianSmearing")),
+    constPhiSmearing_(config.getParameter<bool>("constantPhiSpatialResolution")),
     averageEfficiency_(config.getParameter<double>("averageEfficiency")), 
     // simulateIntrinsicNoise_(config.getParameter<bool>("simulateIntrinsicNoise")),
     // averageNoiseRate_(config.getParameter<double>("averageNoiseRate")), 
@@ -77,7 +79,8 @@ void GEMPreRecoGaussianModel::simulateSignal(const GEMEtaPartition* roll, const 
 {
   for (const auto & hit : simHits)
   {
-    // Digitize only Muons?
+   const GEMDetId gemId(roll->id()); 
+   // Digitize only Muons?
     if (std::abs(hit.particleType()) != 13 && digitizeOnlyMuons_) continue;
     // Digitize only in [minBunch,maxBunch] window
     // window is: [(2n-1)*bxw/2, (2n+1)*bxw/2], n = [minBunch, maxBunch]
@@ -87,20 +90,38 @@ void GEMPreRecoGaussianModel::simulateSignal(const GEMEtaPartition* roll, const 
     // create digi
     auto entry = hit.entryPoint();
     double x=0.0, y=0.0;
+    double sigma_u_new = 0.0;
+ 
+    if(constPhiSmearing_) {
+    sigma_u_new = correctSigmaU(roll, entry.y());
+   }
+   else { 
+    if (gemId.station() == 1) {
+       sigma_u_new = sigma_u;
+    }
+    else {
+       sigma_u_new = sigma_u1;
+    }
+   }
+
+//    std::cout << "station = " << gemId.station() << "selected resolution = " << sigma_u_new << std::endl;
     if(gaussianSmearing_) { // Gaussian Smearing
-      x=gauss_->fire(entry.x(), sigma_u);
-      y=gauss_->fire(entry.x(), sigma_u);
+      x=gauss_->fire(entry.x(), sigma_u_new);
+      y=gauss_->fire(entry.y(), sigma_v);
     }
     else { // Uniform Smearing ... use the sigmas as boundaries
-      x=entry.x()+(flat1_->fire(0., 1.)-0.5)*sigma_u;
+      x=entry.x()+(flat1_->fire(0., 1.)-0.5)*sigma_u_new;
       y=entry.y()+(flat1_->fire(0., 1.)-0.5)*sigma_v;
     }
-    float ex = sigma_u;
+    
+
+    float ex = sigma_u_new;
     float ey = sigma_v;
     float corr = 0.;
     float tof = gauss_->fire(hit.timeOfFlight(), sigma_t);
     int pdgid = hit.particleType();
     GEMDigiPreReco digi(x, y, ex, ey, corr, tof, pdgid, 1);
+    
     digi_.insert(digi);
   }
 }
@@ -146,6 +167,20 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 
   // max length in x for given y coordinate (cfr trapezoidal eta partition)
    double xMax = topLength/2.0 - (height/2.0 - yy_rand) * myTanPhi;
+   double sigma_u_new = 0.0; 
+     
+   if(constPhiSmearing_) {
+    sigma_u_new = correctSigmaU(roll, yy_rand);
+   }
+   else {
+    if (gemId.station() == 1) {
+      sigma_u_new = sigma_u;
+    }
+    else {
+       sigma_u_new = sigma_u1;
+    }
+   }
+   //std::cout << "station = " << gemId.station() << "selected resolution = " << sigma_u_new << std::endl;
 
   // simulate intrinsic noise and background hits in all BX that are being read out
   //for(int bx=minBunch_; bx<maxBunch_+1; ++bx) {
@@ -198,7 +233,7 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 	//calculate xx_rand at a given yy_rand
 	float myRandX = flat1_->fire(0., 1.);
 	float xx_rand = 2 * xMax * (myRandX - 0.5);
-	float ex = sigma_u;
+	float ex = sigma_u_new;
 	float ey = sigma_v;
 	float corr = 0.;
         // extract random BX
@@ -260,7 +295,7 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 	//calculate xx_rand at a given yy_rand
 	float myRandX = flat1_->fire(0., 1.);
 	float xx_rand = 2 * xMax * (myRandX - 0.5);
-	float ex = sigma_u;
+	float ex = sigma_u_new;
 	float ey = sigma_v;
 	float corr = 0.;
         // extract random BX
@@ -281,3 +316,23 @@ void GEMPreRecoGaussianModel::simulateNoise(const GEMEtaPartition* roll)
 
   } //for(int hx=0; hx<heightbins; ++hx) 
 }  // end loop on void class
+
+double GEMPreRecoGaussianModel::correctSigmaU(const GEMEtaPartition* roll, double y) {
+  const TrapezoidalStripTopology* top_(dynamic_cast<const TrapezoidalStripTopology*>(&(roll->topology())));
+  const GEMDetId gemId(roll->id());
+  auto& parameters(roll->specs()->parameters());
+  double height(parameters[2]);       // height     = height from Center of Roll
+  double rollRadius = top_->radius(); // rollRadius = Radius at Center of Roll
+  double Rmax = rollRadius+height;    // MaxRadius  = Radius at top of Roll
+  double Rx = rollRadius+y;           // y in [-height,+height]
+  double sigma_u_new = 0.0 ;
+  if (gemId.station() == 1) { 
+      sigma_u_new = Rx/Rmax*sigma_u;
+  } 
+  else {
+      sigma_u_new = Rx/Rmax*sigma_u1;
+  }
+
+ return sigma_u_new;
+}
+
