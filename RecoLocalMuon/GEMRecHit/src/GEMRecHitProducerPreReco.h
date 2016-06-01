@@ -36,6 +36,7 @@ namespace edm {
 }
 
 class GEMRecHitBaseAlgoPreReco;
+class GEMRecHitBaseAlgo;
 
 class GEMRecHitProducerPreReco : public edm::EDProducer {
 
@@ -56,8 +57,12 @@ private:
 
   // The label to be used to retrieve GEM digis from the event
   edm::InputTag thePreGEMDigiLabel;
+  edm::InputTag theGEMDigiLabel;  
+
+
   // The reconstruction algorithm
-  GEMRecHitBaseAlgoPreReco *theAlgo;
+  GEMRecHitBaseAlgoPreReco *thePreAlgo;
+  GEMRecHitBaseAlgo *theAlgo;
   //   static std::string theAlgoName;
 
 
