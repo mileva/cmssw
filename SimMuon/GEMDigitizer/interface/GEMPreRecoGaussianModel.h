@@ -22,17 +22,20 @@ public:
   void simulateSignal(const GEMEtaPartition*, const edm::PSimHitContainer&);
   void setRandomEngine(CLHEP::HepRandomEngine&);
   void simulateNoise(const GEMEtaPartition*);
+  double correctSigmaU(const GEMEtaPartition*, double);
   void setup()
   {
   }
 private:
   double sigma_t;
   double sigma_u;
+  double sigma_u1;
   double sigma_v;
   bool corr;
   bool etaproj;
   bool digitizeOnlyMuons_;
   double gaussianSmearing_;
+  double constPhiSmearing_;
   double averageEfficiency_;
   // bool simulateIntrinsicNoise_; // not implemented
   // double averageNoiseRate_;     // not implemented
