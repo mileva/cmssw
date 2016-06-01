@@ -6,6 +6,9 @@ gemRecHitsPreReco = cms.EDProducer("GEMRecHitProducerPreReco",
     ),
     prerecAlgo = cms.string('GEMRecHitStandardAlgoPreReco'),
     gemPreDigiLabel = cms.InputTag("simMuonGEMDigiswithTiming"),
+    recAlgo = cms.string('GEMRecHitStandardAlgo'),
+    gemDigiLabel = cms.InputTag("simMuonGEMDigis"),
+  
 )
 
 
