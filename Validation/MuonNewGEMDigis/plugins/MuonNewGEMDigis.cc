@@ -451,7 +451,7 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             GlobalPoint gp = surface.toGlobal(lp);
             Float_t g_r = (Float_t) gp.perp();
             //std::cout <<"g_r == " << g_r << std::endl;
-           //  Float_t g_eta = (Float_t) gp.eta();
+            Float_t g_eta = (Float_t) gp.eta();
           //  Float_t g_phi = (Float_t) gp.phi();
             Float_t g_x = (Float_t) gp.x();
             Float_t g_y = (Float_t) gp.y();
@@ -541,55 +541,67 @@ MuonNewGEMDigis::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
             if(!(digiItr->prompt())){
                   if(st==1){
                   gemCollection["strip_dg_R_st1_NoPrompt"]->Fill(g_r);
+                  gemCollection["strip_dg_eta_st1_NoPrompt"]->Fill(g_eta);
                   gemCollection["strip_dg_timing_st1_NoPrompt"]->Fill(timing);
                   }
                   if(st==2){
                   gemCollection["strip_dg_R_st2_NoPrompt"]->Fill(g_r);
+                  gemCollection["strip_dg_eta_st2_NoPrompt"]->Fill(g_eta);
                   gemCollection["strip_dg_timing_st2_NoPrompt"]->Fill(timing);
                   }
                   if(st==3){
                   gemCollection["strip_dg_R_st3_NoPrompt"]->Fill(g_r);
+                  gemCollection["strip_dg_eta_st3_NoPrompt"]->Fill(g_eta);
                   gemCollection["strip_dg_timing_st3_NoPrompt"]->Fill(timing);
                   }
                   if ( fabs(particleType) == 11 ){
                      if(st==1){
                      gemCollection["strip_dg_R_st1_NoPrompt_e"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st1_NoPrompt_e"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st1_NoPrompt_e"]->Fill(timing);
                      }
                      if(st==2){
                      gemCollection["strip_dg_R_st2_NoPrompt_e"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st2_NoPrompt_e"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st2_NoPrompt_e"]->Fill(timing);
                      }
                      if(st==3){
                      gemCollection["strip_dg_R_st3_NoPrompt_e"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st3_NoPrompt_e"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st3_NoPrompt_e"]->Fill(timing);
                      }
                   }
                   if ( particleType == 2112 ){
                      if(st==1){
                      gemCollection["strip_dg_R_st1_NoPrompt_n"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st1_NoPrompt_n"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st1_NoPrompt_n"]->Fill(timing);
                      }
                      if(st==2){
                      gemCollection["strip_dg_R_st2_NoPrompt_n"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st1_NoPrompt_n"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st2_NoPrompt_n"]->Fill(timing);
                      }
                      if(st==3){
                      gemCollection["strip_dg_R_st3_NoPrompt_n"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st3_NoPrompt_n"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st3_NoPrompt_n"]->Fill(timing);
                      }
                   }
                   if ( particleType == 22 ) {
                      if(st==1){
                      gemCollection["strip_dg_R_st1_NoPrompt_g"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st1_NoPrompt_g"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st1_NoPrompt_g"]->Fill(timing);
                      }
                      if(st==2){
                      gemCollection["strip_dg_R_st2_NoPrompt_g"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st2_NoPrompt_g"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st2_NoPrompt_g"]->Fill(timing);
                      }
                      if(st==3){
                      gemCollection["strip_dg_R_st3_NoPrompt_g"]->Fill(g_r);
+                     gemCollection["strip_dg_eta_st3_NoPrompt_g"]->Fill(g_eta);
                      gemCollection["strip_dg_timing_st3_NoPrompt_g"]->Fill(timing);
                      }
                   }
@@ -663,7 +675,7 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
         gemCollection["num_events"]=dbe->book1D("num_events","Number Total Events",3,0,2);
         gemCollection["strip_dg_zr_rm1"]=dbe->book2D("strip_dg_zr_rm1","Digi occupancy: region m1;globalZ [cm];globalR [cm]",80,-555,-515,120,20,160);
         gemCollection["strip_dg_zr_rp1"]=dbe->book2D("strip_dg_zr_rp1","Digi occupancy: region p1;globalZ [cm];globalR [cm]",80,515,555,120,20,160);
-        gemCollection["digiDX"]=dbe->book1D("digiDX","x^{digi}_{sim} - x^{digi}_{rec}; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",100,-10,+10);
+        gemCollection["digiDX"]=dbe->book1D("digiDX","x^{digi}_{sim} - x^{digi}_{rec}; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",1000,-50,+50);
         gemCollection["digiDPhi"]=dbe->book1D("digiDPhi","Phi^{digi}_{sim} - Phi^{digi}_{rec}; Phi^{digi}_{sim} - Phi^{digi}_{rec} [rad]; entries",10000,-10,+10);
  
 
@@ -677,7 +689,7 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
             gemCollection["strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_prompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_prompt","Digi occupancy Prompt: region "+region[k]+", station "+stations[m]+", layer "+layers[j]+" ;globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
             gemCollection["strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_NoPrompt"]=dbe->book2D("strip_dg_xy_r"+region[k]+"_"+stations[m]+"_"+layers[j]+"_NoPrompt","Digi occupancy NoPrompt: region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; globalX [cm];globalY [cm]",120,-280,280,120,-280,280);
 
-            gemCollection["digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book1D("digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j],"x^{digi}_{sim} - x^{digi}_{rec} region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",100,-10,+10);
+            gemCollection["digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book1D("digiDX_r"+region[k]+"_"+stations[m]+"_"+layers[j],"x^{digi}_{sim} - x^{digi}_{rec} region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; x^{digi}_{sim} - x^{digi}_{rec} [cm]; entries",1000,-50,+50);
 
            gemCollection["digiDPhi_r"+region[k]+"_"+stations[m]+"_"+layers[j]]=dbe->book1D("digiDPhi_r"+region[k]+"_"+stations[m]+"_"+layers[j],"Phi^{digi}_{sim} - Phi^{digi}_{rec} region "+region[k]+", station "+stations[m]+", layer "+layers[j]+"; Phi^{digi}_{sim} - Phi^{digi}_{rec} [rad]; entries",10000,-10,+10);
             }
@@ -689,21 +701,21 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
         dbe->setCurrentFolder(prompt_folder);
         gemCollection["strip_dg_zr_prompt"]=dbe->book2D("strip_dg_zr_prompt","Digi occupancy Prompt: region m1;globalZ [cm];globalR [cm]",80,515,555,120,20,160);
         // Prompt particles spectrum Vs R
-        gemCollection["strip_dg_R_st1_prompt"]   =dbe->book1D("strip_dg_R_st1_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_prompt"]   =dbe->book1D("strip_dg_R_st2_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station2 ",270,130,400);
-        gemCollection["strip_dg_R_st3_prompt"]   =dbe->book1D("strip_dg_R_st3_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_prompt"]   =dbe->book1D("strip_dg_R_st1_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station 1 ",240,130,400);
+        gemCollection["strip_dg_R_st2_prompt"]   =dbe->book1D("strip_dg_R_st2_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station2 ",240,130,400);
+        gemCollection["strip_dg_R_st3_prompt"]   =dbe->book1D("strip_dg_R_st3_prompt","Digi R distribution Prompt; globalR [cm]; Events; Station3 ",240,130,400);
  
-       gemCollection["strip_dg_R_st1_prompt_e"]   =dbe->book1D("strip_dg_R_st1_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events: Station 1 ",270,130,400);
-       gemCollection["strip_dg_R_st2_prompt_e"]   =dbe->book1D("strip_dg_R_st2_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 2 ",270,130,400);
-       gemCollection["strip_dg_R_st3_prompt_e"]   =dbe->book1D("strip_dg_R_st3_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 3 ",270,130,400);
+       gemCollection["strip_dg_R_st1_prompt_e"]   =dbe->book1D("strip_dg_R_st1_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events: Station 1 ",240,130,400);
+       gemCollection["strip_dg_R_st2_prompt_e"]   =dbe->book1D("strip_dg_R_st2_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 2 ",240,130,400);
+       gemCollection["strip_dg_R_st3_prompt_e"]   =dbe->book1D("strip_dg_R_st3_prompt_e","Digi R distribution Prompt electrons; globalR [cm]; Events; Station 3 ",240,130,400);
 
-        gemCollection["strip_dg_R_st1_prompt_m"]   =dbe->book1D("strip_dg_R_st1_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_prompt_m"]   =dbe->book1D("strip_dg_R_st2_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 2 ",270,130,400);
-        gemCollection["strip_dg_R_st3_prompt_m"]   =dbe->book1D("strip_dg_R_st3_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_prompt_m"]   =dbe->book1D("strip_dg_R_st1_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 1 ",240,130,400);
+        gemCollection["strip_dg_R_st2_prompt_m"]   =dbe->book1D("strip_dg_R_st2_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 2 ",240,130,400);
+        gemCollection["strip_dg_R_st3_prompt_m"]   =dbe->book1D("strip_dg_R_st3_prompt_m","Digi R distribution Prompt muons; globalR [cm]; Events; Station 3 ",240,130,400);
 
-        gemCollection["strip_dg_R_st1_prompt_h"]   =dbe->book1D("strip_dg_R_st1_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_prompt_h"]   =dbe->book1D("strip_dg_R_st2_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 2 ",270,130,400);
-        gemCollection["strip_dg_R_st3_prompt_h"]   =dbe->book1D("strip_dg_R_st3_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_prompt_h"]   =dbe->book1D("strip_dg_R_st1_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 1 ",240,130,400);
+        gemCollection["strip_dg_R_st2_prompt_h"]   =dbe->book1D("strip_dg_R_st2_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 2 ",240,130,400);
+        gemCollection["strip_dg_R_st3_prompt_h"]   =dbe->book1D("strip_dg_R_st3_prompt_h","Digi R distribution Prompt hadrons; globalR [cm]; Events; Station 3 ",240,130,400);
         // Prompt Timing
         gemCollection["strip_dg_st1_prompt_timing"]    =  dbe->book1D("strip_dg_st1_prompt_timing","Digi Timing Distribution Prompt; time [ns]; Events; Station 1",250,-150,100);
         gemCollection["strip_dg_st2_prompt_timing"]    =  dbe->book1D("strip_dg_st2_prompt_timing","Digi Timing Distribution Prompt; time [ns]; Events; Station 2",250,-150,100);
@@ -724,21 +736,38 @@ void MuonNewGEMDigis::beginRun(edm::Run const&, edm::EventSetup const& iSetup)
         dbe->setCurrentFolder(noPrompt_folder);
         gemCollection["strip_dg_zr_NoPrompt"]=dbe->book2D("strip_dg_zr_NoPrompt","Digi occupancy NoPrompt: region m1;global|Z| [cm];globalR [cm]",80,515,555,120,20,160);
         // NoPrompt particles spectrum Vs R
-        gemCollection["strip_dg_R_st1_NoPrompt"]   =dbe->book1D("strip_dg_R_st1_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_NoPrompt"]   =dbe->book1D("strip_dg_R_st2_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 2 ",270,130,400); 
-        gemCollection["strip_dg_R_st3_NoPrompt"]   =dbe->book1D("strip_dg_R_st3_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_NoPrompt"]   =dbe->book1D("strip_dg_R_st1_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 1 ",240,130,320);
+        gemCollection["strip_dg_R_st2_NoPrompt"]   =dbe->book1D("strip_dg_R_st2_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 2 ",240,130,320); 
+        gemCollection["strip_dg_R_st3_NoPrompt"]   =dbe->book1D("strip_dg_R_st3_NoPrompt","Digi R distribution NoPrompt; globalR [cm]; Events; Station 3 ",240,130,320);
 
-        gemCollection["strip_dg_R_st1_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 2 ",270,130,400);
-       gemCollection["strip_dg_R_st3_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 1 ",240,130,320);
+        gemCollection["strip_dg_R_st2_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 2 ",240,130,320);
+       gemCollection["strip_dg_R_st3_NoPrompt_e"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_e","Digi R distribution NoPrompt electrons; globalR [cm]; Events Station 3 ",240,130,320);
 
-        gemCollection["strip_dg_R_st1_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 2 ",270,130,400);
-        gemCollection["strip_dg_R_st3_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 3 ",270,130,400);       
+        gemCollection["strip_dg_R_st1_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 1 ",240,130,320);
+        gemCollection["strip_dg_R_st2_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 2 ",240,130,320);
+        gemCollection["strip_dg_R_st3_NoPrompt_n"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_n","Digi R distribution NoPrompt neutrons; globalR [cm]; Events; Station 3 ",240,130,320);       
 
-        gemCollection["strip_dg_R_st1_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 1 ",270,130,400);
-        gemCollection["strip_dg_R_st2_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 2 ",270,130,400);
-        gemCollection["strip_dg_R_st3_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 3 ",270,130,400);
+        gemCollection["strip_dg_R_st1_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st1_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 1 ",240,130,320);
+        gemCollection["strip_dg_R_st2_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st2_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 2 ",240,130,320);
+        gemCollection["strip_dg_R_st3_NoPrompt_g"]   =dbe->book1D("strip_dg_R_st3_NoPrompt_g","Digi R distribution NoPrompt gammas; globalR [cm]; Events; Station 3 ",240,130,320);
+
+       // NoPrompt particles spectrum Vs eta
+       gemCollection["strip_dg_eta_st1_NoPrompt"]   =dbe->book1D("strip_dg_eta_st1_NoPrompt","Digi Eta distribution NoPrompt; globalEta; Events; Station 1 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st2_NoPrompt"]   =dbe->book1D("strip_dg_eta_st2_NoPrompt","Digi Eta distribution NoPrompt; globalEta; Events; Station 2 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st3_NoPrompt"]   =dbe->book1D("strip_dg_eta_st3_NoPrompt","Digi Eta distribution NoPrompt; globalEta; Events; Station 3 ",240,1.6,2.4);
+
+      gemCollection["strip_dg_eta_st1_NoPrompt_e"]   =dbe->book1D("strip_dg_eta_st1_NoPrompt_e","Digi Eta distribution NoPrompt electrons; globalEta; Events; Station 1 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st2_NoPrompt_e"]   =dbe->book1D("strip_dg_eta_st2_NoPrompt_e","Digi Eta distribution NoPrompt electrons; globalEta; Events; Station 2 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st3_NoPrompt_e"]   =dbe->book1D("strip_dg_eta_st3_NoPrompt_e","Digi Eta distribution NoPrompt electrons; globalEta; Events; Station 3 ",240,1.6,2.4);
+
+      gemCollection["strip_dg_eta_st1_NoPrompt_n"]   =dbe->book1D("strip_dg_eta_st1_NoPrompt_n","Digi Eta distribution NoPrompt neutrons; globalEta; Events; Station 1 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st2_NoPrompt_n"]   =dbe->book1D("strip_dg_eta_st2_NoPrompt_n","Digi Eta distribution NoPrompt neutrons; globalEta; Events; Station 2 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st3_NoPrompt_n"]   =dbe->book1D("strip_dg_eta_st3_NoPrompt_n","Digi Eta distribution NoPrompt neutrons; globalEta; Events; Station 3 ",240,1.6,2.4);
+
+      gemCollection["strip_dg_eta_st1_NoPrompt_g"]   =dbe->book1D("strip_dg_eta_st1_NoPrompt_g","Digi Eta distribution NoPrompt gammas; globalEta; Events; Station 1 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st2_NoPrompt_g"]   =dbe->book1D("strip_dg_eta_st2_NoPrompt_g","Digi Eta distribution NoPrompt gammas; globalEta; Events; Station 2 ",240,1.6,2.4);
+        gemCollection["strip_dg_eta_st3_NoPrompt_g"]   =dbe->book1D("strip_dg_eta_st3_NoPrompt_g","Digi Eta distribution NoPrompt gammas; globalEta; Events; Station 3 ",240,1.6,2.4);
 
         // NoPrompt Timing
         gemCollection["strip_dg_timing_st1_NoPrompt"]    =  dbe->book1D("strip_dg_timing_st1_NoPrompt","Digi Timing Distribution non-Prompt; time [ns]; Events; Station 1",250,-150,100);
