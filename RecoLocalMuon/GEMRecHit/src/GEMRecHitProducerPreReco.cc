@@ -80,6 +80,7 @@ void GEMRecHitProducerPreReco::beginRun(const edm::Run& r, const edm::EventSetup
 
 void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
 
+//  std::cout << " event loop started  " << std::endl;
   // Get the GEM Geometry
 
   ESHandle<GEMGeometry> gemGeom;
@@ -93,21 +94,21 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
   Handle<GEMDigiCollection> digis; 
   event.getByLabel(theGEMDigiLabel,digis);
 
+// Create the pointer to the collection which will store the rechits
+   auto_ptr<GEMRecHitCollection> recHitCollection(new GEMRecHitCollection());
+   
 
   // Pass the EventSetup to the algo
 
   thePreAlgo->setES(setup);
-
-  // Create the pointer to the collection which will store the rechits
-
-  auto_ptr<GEMRecHitCollection> recHitCollection(new GEMRecHitCollection());
 
   // Iterate through all digi collections ordered by LayerId   
 
   GEMDigiPreRecoCollection::DigiRangeIterator gempredgIt;
   for (gempredgIt = predigis->begin(); gempredgIt != predigis->end();
        ++gempredgIt){
-       
+
+     std::cout << " in the pseudo digi loop " << std::endl;       
     // The layerId
     const GEMDetId& gemId = (*gempredgIt).first;
 
@@ -117,8 +118,9 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
 
     // Call the reconstruction algorithm    
 
-    if(gemId.station() == 2 || gemId.station() == 3){
-      std::cout << "station for pseudo digis = " << gemId.station() << std::endl;
+//    if(gemId.station() == 2 || gemId.station() == 3){
+    if(gemId.station() == 3){              ////masking the hits from short station
+     std::cout << "station for pseudo digis = " << gemId.station() << std::endl;
 
     OwnVector<GEMRecHit> recHits =
       thePreAlgo->reconstruct(gemId, range);
@@ -128,6 +130,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
    }
   }
 
+
    // Pass the EventSetup to the algo
     theAlgo->setES(setup);
 
@@ -136,6 +139,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
    for (gemdgIt = digis->begin(); gemdgIt != digis->end();
        ++gemdgIt){
 
+  ///   std::cout << " in the real digi loop " << std::endl;
      // The layerId
      const GEMDetId& gemId = (*gemdgIt).first;
 
@@ -149,7 +153,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
       EtaPartitionMask mask;
   
      if(gemId.station() == 1){
-     std::cout << "station for real digis = " << gemId.station() << std::endl;
+   ///  std::cout << "station for real digis = " << gemId.station() << "layer for real digis " << gemId.layer() << std::endl;
 
      OwnVector<GEMRecHit> recHits =
      theAlgo->reconstruct(*roll, gemId, range, mask);
