@@ -1,6 +1,7 @@
 <lcgdict>
 <selection>
-  <class name="GEMRecHit" splitLevel="0" ClassVersion="11">
+  <class name="GEMRecHit" splitLevel="0" ClassVersion="12">
+   <version ClassVersion="12" checksum="1294069548"/>
    <version ClassVersion="11" checksum="1680346690"/>
    <version ClassVersion="10" checksum="3680872192"/>
   </class>

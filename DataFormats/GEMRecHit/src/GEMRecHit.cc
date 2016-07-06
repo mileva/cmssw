@@ -16,7 +16,7 @@ GEMRecHit::GEMRecHit(const GEMDetId& gemId, int bx) :  RecHit2DLocalPos(gemId),
 }
 
 GEMRecHit::GEMRecHit() :  RecHit2DLocalPos(),
-  theGEMId(), theBx(99), theTOF(0.), theFirstStrip(99),theClusterSize(99), theLocalPosition(), theLocalError() 
+  theGEMId(), theBx(99), theFirstStrip(99),theClusterSize(99), theTOF(0.),theLocalPosition(), theLocalError() 
 {
 }
 
@@ -51,9 +51,10 @@ GEMRecHit::GEMRecHit(const GEMDetId& gemId,
 		     int bx,                  
 		     int firstStrip,
 		     int clustSize,
+                     float tof,
 		     const LocalPoint& pos,
 		     const LocalError& err) :  RecHit2DLocalPos(gemId),
-  theGEMId(gemId), theBx(bx), theFirstStrip(firstStrip), theClusterSize(clustSize), theLocalPosition(pos), theLocalError(err) 
+  theGEMId(gemId), theBx(bx), theFirstStrip(firstStrip), theClusterSize(clustSize), theTOF(tof), theLocalPosition(pos), theLocalError(err) 
 {
 }
 
