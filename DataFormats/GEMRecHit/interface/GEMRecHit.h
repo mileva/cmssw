@@ -44,6 +44,7 @@ class GEMRecHit : public RecHit2DLocalPos {
 	    int bx,           
 	    int firstStrip,
 	    int clustSize,
+            float tof,
 	    const LocalPoint& pos,
 	    const LocalError& err);
 
@@ -128,9 +129,9 @@ class GEMRecHit : public RecHit2DLocalPos {
  private:
   GEMDetId theGEMId;
   int theBx;
-  float theTOF;
   int theFirstStrip;
   int theClusterSize;
+  float theTOF;
   // Position and error in the Local Ref. Frame of the GEMLayer
   LocalPoint theLocalPosition;
   LocalError theLocalError;
