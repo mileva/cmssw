@@ -97,7 +97,7 @@ STAMuonAnalyzer::STAMuonAnalyzer(const ParameterSet& pset):
   isGlobalMuon_ = pset.getUntrackedParameter<bool>("isGlobalMuon",false);
 
   minEta_ = pset.getUntrackedParameter<double>("minEta",1.64);
-  maxEta_ = pset.getUntrackedParameter<double>("maxEta",2.1);
+  maxEta_ = pset.getUntrackedParameter<double>("maxEta",2.4);
 
   theDataType = pset.getUntrackedParameter<string>("DataType");
   
@@ -170,6 +170,12 @@ void STAMuonAnalyzer::beginJob(){
   histContainer_["hNumGEMRecHitsSt2"] = fs->make<TH1F>("NumGEMRecHitsSt2","NumGEMRecHitsSt2",11,-0.5,10.5);
   histContainer_["hNumGEMRecHitsSt3"] = fs->make<TH1F>("NumGEMRecHitsSt3","NumGEMRecHitsSt3",11,-0.5,10.5);
   histContainer_["hNumGEMRecHitsMuon"] = fs->make<TH1F>("NumGEMRecHitsMuon","NumGEMRecHitsMuon",11,-0.5,10.5);
+
+  histContainer_["hNumCSCRecHitsSt1"] = fs->make<TH1F>("NumCSCRecHitsSt1","NumCSCRecHitsSt1",11,-0.5,10.5);
+  histContainer_["hNumCSCRecHitsSt2"] = fs->make<TH1F>("NumCSCRecHitsSt2","NumCSCRecHitsSt2",11,-0.5,10.5);
+  histContainer_["hNumCSCRecHitsSt3"] = fs->make<TH1F>("NumCSCRecHitsSt3","NumCSCRecHitsSt3",11,-0.5,10.5);
+  histContainer_["hNumCSCRecHitsSt4"] = fs->make<TH1F>("NumCSCRecHitsSt4","NumCSCRecHitsSt4",11,-0.5,10.5);
+
 
   histContainer2D_["hRecoPtVsSimPt"] = fs->make<TH2F>("RecoPtVsSimPt","p_{T}^{Reco} vs. p_{T}^{Sim}",261,-2.5,1302.5,261,-2.5,1302.5);
   histContainer2D_["hDeltaPtVsSimPt"] = fs->make<TH2F>("DeltaPtVsSimPt","(p_{T}^{Reco} - p_{T}^{Sim}) vs. p_{T}^{Sim}",261,-2.5,1302.5,500,-500,500);
@@ -643,7 +649,8 @@ MyMuon muonTrackMatching(const Event & event, SimTrackContainer::const_iterator 
 }
 
 void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup){
-  
+ 
+    std::cout << "event started" << std::endl; 
   //cout << "Run: " << event.id().run() << " Event: " << event.id().event() << endl;
   MuonPatternRecoDumper debug;
   
@@ -722,6 +729,7 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
   SimTrackContainer::const_iterator simTrack;
 
   for (simTrack = simTracks->begin(); simTrack != simTracks->end(); ++simTrack){
+        std::cout << "SIM track found " << std::endl;
 
 	int countMatching = 0;
 
@@ -745,9 +753,10 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
 	if(size == 0) continue;
 
 	int drMatching = countDrMatching(simTrack, staTracks, minEta_, maxEta_);
-	//std::cout<<"Matching with: "<<drMatching<<" reco tracks"<<std::endl;
+	std::cout<<"Matching with: "<<drMatching<<" reco tracks"<<std::endl;
 	if(drMatching > 1) continue;
-
+ 
+        std::cout << "matched with reco tracks " << std::endl;
 	MyMuon muon;
 	muon = muonMatching(event, simTrack, noGEMCase_, minEta_, maxEta_, muonLabel_);
 
@@ -797,6 +806,7 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
   	double recPtIP = 0.;
 
 	for (staTrack = staTracks->begin(); staTrack != staTracks->end(); ++staTrack){//Inizio del loop sulle STA track
+                std::cout << "STA track found " << std::endl;
 
 	    	reco::TransientTrack track(*staTrack,&*theMGField,theTrackingGeometry); 
 	    	TrajectoryStateOnSurface innerTSOS = track.innermostMeasurementState();
@@ -811,12 +821,14 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
 
 		double recEta = staTrack->momentum().eta();
 		double recPhi = staTrack->momentum().phi();
-		//cout<<"RecEta "<<recEta<<" recPhi "<<recPhi<<std::endl;
+	        //double recTime = 
+         	//cout<<"RecEta "<<recEta<<" recPhi "<<recPhi<<std::endl;
 		double dR = sqrt(pow((simEta-recEta),2) + pow((simPhi-recPhi),2));
-		//cout<<"dR "<<dR<<std::endl;
+		cout<<"dR of STA and Reco Track"<<dR<<std::endl;
 
 		if(dR > 0.1) continue;
 	    
+                std::cout << "track is matched " << std::endl;
 	    	//recPt = track.impactPointTSCP().momentum().perp();  
 		recPt = staTrack->pt();
 		recPtIP = track.impactPointTSCP().momentum().perp();
@@ -835,6 +847,7 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
 
 		bool hasGemRecHits = false;
 		int numGEMRecHits = 0, numGEMRecHitsSt1 = 0, numGEMRecHitsSt2 = 0, numGEMRecHitsSt3 = 0;
+                int numME11 = 0, numME21 = 0, numME31 = 0, numME41 = 0;
 
 		std::vector<bool> collectResults;
 
@@ -845,25 +858,38 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
 
 		for(trackingRecHit_iterator recHit = staTrack->recHitsBegin(); recHit != staTrack->recHitsEnd(); ++recHit){
 
+                     std::cout<< "rec Hits loop started " << std::endl;
 			if (!((*recHit)->geographicalId().det() == DetId::Muon)) continue;
 
 			if ((*recHit)->geographicalId().subdetId() == MuonSubdetId::GEM){
 
+                                std::cout<< "rec Hits contains GEMs " << std::endl;
 				//std::cout<<"GEM id: "<<GEMDetId((*recHit)->geographicalId().rawId())<<std::endl;
 				numGEMRecHits++;
 				hasGemRecHits = true;
+                         
+                               int index = std::distance(staTrack->recHitsBegin(), recHit);
+                                TrackingRecHitRef tRH = staTrack->recHit(index);
 
-				int index = std::distance(staTrack->recHitsBegin(), recHit);
-				TrackingRecHitRef tRH = staTrack->recHit(index);
+                                MyGEMSimHit sh;
+                                MyGEMRecHit rh;
+ 
+                                if(rh.station == 1) numGEMRecHitsSt1++;
+                                if(rh.station == 2) numGEMRecHitsSt2++;
+                                if(rh.station == 3) numGEMRecHitsSt3++;
 
-				MyGEMSimHit sh;
-				MyGEMRecHit rh;
+                                if(rh.station == 1){
+                                  std::cout<< "rec Hits from station 1" << " from region " << rh.region << " from layer " << std::endl;
+                                  std::cout<< "global eta == " << rh.globalEta << " global phi == " << rh.globalPhi << " x position == " << rh.x << " bx ==" << rh.bx << " cluster size == " << rh.clusterSize << " first cluster strip == " << rh.firstClusterStrip<< std::endl;
+                                  }
+
+                                if(rh.station == 3){
+                                  std::cout<< "rec Hits from station 3" << " from region " << rh.region << " from layer " << std::endl;
+                                  std::cout<< "global eta == " << rh.globalEta << " global phi == " << rh.globalPhi << " x position == " << rh.x << " bx ==" << rh.bx << " cluster size == " << rh.clusterSize << " first cluster strip == " << rh.firstClusterStrip<< std::endl;
+                                   }
+
 				bool status = isRecHitMatched(selGEMSimHits, tRH, gemGeom, sh, rh);
 				collectResults.push_back(status);
-
-				if(rh.station == 1) numGEMRecHitsSt1++;
-				if(rh.station == 2) numGEMRecHitsSt2++;
-				if(rh.station == 3) numGEMRecHitsSt3++;
 
 				if(!isGlobalMuon_ & status){
 				
@@ -903,15 +929,38 @@ void STAMuonAnalyzer::analyze(const Event & event, const EventSetup& eventSetup)
 
 				}
 
-			}
+			}  ////// GEM Rec Hit loop
+/////////////////////////////////////////checking the CSC Hits //////////////////////////////////////////////////////////////
+                
+                      if ((*recHit)->geographicalId().subdetId() == MuonSubdetId::CSC){
+                        //   std::cout<<"CSC found"<<std::endl;
 
-		}
+                                CSCDetId id((*recHit)->geographicalId());
+                                //int region = id.endcap();
+                                int station = id.station();
+                                int ring = id.ring();   
+                                // int layer = id.layer();
+                                 if(station == 1 && (ring == 1 || ring == 4)) numME11++;
+                                 if(station == 2 && ring == 1) numME21++;
+                                 if(station == 3 && ring == 1) numME31++;
+                                 if(station == 4 && ring == 1) numME41++;
+                                //std::cout<<"CSC Region"<<region<<" Station "<<station<<" ring "<<ring<<" layer "<<layer<<std::endl;
 
+        
+
+                  } ////// csc Rec Hit loop
+
+		} /// rec Hit loop
+
+                std::cout<< " In a Event rec Hits from station 1 " << numGEMRecHitsSt1 << std::endl;
 		histContainer_["hNumGEMRecHits"]->Fill(numGEMRecHits);
 		histContainer_["hNumGEMRecHitsSt1"]->Fill(numGEMRecHitsSt1);
 		histContainer_["hNumGEMRecHitsSt2"]->Fill(numGEMRecHitsSt2);
 		histContainer_["hNumGEMRecHitsSt3"]->Fill(numGEMRecHitsSt3);
-
+                histContainer_["hNumCSCRecHitsSt1"]->Fill(numME11);
+                histContainer_["hNumCSCRecHitsSt2"]->Fill(numME21);
+                histContainer_["hNumCSCRecHitsSt3"]->Fill(numME31);
+                histContainer_["hNumCSCRecHitsSt4"]->Fill(numME41);
 		int sizeRH = 0;
 		bool matchingHit = true;
 		bool matchingParHit = false;
