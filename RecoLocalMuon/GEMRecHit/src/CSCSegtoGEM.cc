@@ -68,10 +68,9 @@ ObjectMapCSC::ObjectMapCSC(const edm::EventSetup& iSetup){
 //	  int cscchamber = rpcsegment; //FIX THIS ACCORDING TO RPCGeomServ::segment()Definition
 	  int cscchamber = gemsegment;
 
-          if((station==2||station==3)&&ring==3){//Adding Ring 3 of RPC to the CSC Ring 2
+          if((station==2||station==3||station==4)&&ring==3){//Adding Ring 3 of RPC to the CSC Ring 2
             cscring = 2;
-//            if(debug) 
-              std::cout << "I found a GEM chamber on the station out of range, station number = " << station << std::endl;
+            std::cout << "I found a GEM chamber on the station out of range, station number = " << station << std::endl;
           }
 
 	  CSCStationIndex ind(region,cscstation,cscring,cscchamber);
