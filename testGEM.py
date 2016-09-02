@@ -52,7 +52,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'PH2_1K_FB_V6::All', '')
 
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10)
+    input = cms.untracked.int32(10000)
 )
 
 #readFiles = cms.untracked.vstring()
@@ -71,11 +71,8 @@ process.source = cms.Source("PoolSource",
 )
 
 process.dTandCSCSegmentsinTracks = cms.EDProducer("DTandCSCSegmentsinTracks",
-                                                  #cscSegments = cms.untracked.InputTag("hltCscSegments"),
-                                                  #dt4DSegments = cms.untracked.InputTag("hltDt4DSegments"),
                                                   cscSegments = cms.untracked.InputTag("cscSegments"),
-                                                  dt4DSegments = cms.untracked.InputTag("dt4DSegments"),
-#                                                  tracks = cms.untracked.InputTag("standAloneMuons","")
+#                                                  dt4DSegments = cms.untracked.InputTag("dt4DSegments"),
                                                   tracks = cms.untracked.InputTag("standAloneMuons","UpdatedAtVtx")
                                                   )
 
@@ -85,7 +82,7 @@ process.gemPointProducer = cms.EDProducer('GEMPointProducer',
 #  incldt = cms.untracked.bool(True),
   inclcsc = cms.untracked.bool(True),
   incltrack =  cms.untracked.bool(False),
-  debug = cms.untracked.bool(True),
+  debug = cms.untracked.bool(False),
   rangestrips = cms.untracked.double(4.),
   rangestripsRB4 = cms.untracked.double(4.),
   MinCosAng = cms.untracked.double(0.85),
@@ -95,7 +92,7 @@ process.gemPointProducer = cms.EDProducer('GEMPointProducer',
   #cscSegments = cms.InputTag('dTandCSCSegmentsinTracks','SelectedCscSegments','OwnParticles'),
   #dt4DSegments = cms.InputTag('dTandCSCSegmentsinTracks','SelectedDtSegments','OwnParticles'),
   cscSegments = cms.InputTag('cscSegments', '', 'RECO'),
-  dt4DSegments = cms.InputTag('dt4DSegments', '', 'RECO'),
+#  dt4DSegments = cms.InputTag('dt4DSegments', '', 'RECO'),
   tracks = cms.InputTag("standAloneMuons"),
   TrackTransformer = cms.PSet(
       DoPredictionsOnly = cms.bool(False),
@@ -110,58 +107,34 @@ process.gemPointProducer = cms.EDProducer('GEMPointProducer',
   )
 )
 
-process.museg = cms.EDAnalyzer("MuonSegmentEff",
-    incldt = cms.untracked.bool(True),
-    incldtMB4 = cms.untracked.bool(True),
+#process.museg = cms.EDAnalyzer("MuonSegmentEff",
+process.museg = cms.EDAnalyzer("GEMMuonSegment",
+#    incldt = cms.untracked.bool(True),
+#    incldtMB4 = cms.untracked.bool(True),
     inclcsc = cms.untracked.bool(True),
     debug = cms.untracked.bool(False),
     inves = cms.untracked.bool(True),
     DuplicationCorrection = cms.untracked.int32(1),
     manualalignment = cms.untracked.bool(False),
-    AliFileName = cms.untracked.string('../../../DQM/RPCMonitorModule/data/Alignment69912.dat'),
+    AliFileName = cms.untracked.string(''),
     rangestrips = cms.untracked.double(4.),
-    #cscSegments = cms.untracked.InputTag('hltCscSegments'),	#use hltSegments with RPCMonitor
-    #dt4DSegments = cms.untracked.InputTag('hltDt4DSegments'),
-    #rpcRecHits = cms.untracked.InputTag("hltRpcRecHits"),
-    rpcRecHits = cms.untracked.InputTag("rpcRecHits"),
+#    rpcRecHits = cms.untracked.InputTag("rpcRecHits"),
+    gemRecHits = cms.untracked.InputTag("gemRecHits"),
     cscSegments = cms.untracked.InputTag('cscSegments'),
-    dt4DSegments = cms.untracked.InputTag('dt4DSegments'),
-    rpcDTPoints = cms.untracked.InputTag("rpcPointProducer","RPCDTExtrapolatedPoints"),
-    rpcCSCPoints = cms.untracked.InputTag("rpcPointProducer","RPCCSCExtrapolatedPoints"),
+#    dt4DSegments = cms.untracked.InputTag('dt4DSegments'),
+#    rpcDTPoints = cms.untracked.InputTag("rpcPointProducer","RPCDTExtrapolatedPoints"),
+#    rpcCSCPoints = cms.untracked.InputTag("rpcPointProducer","RPCCSCExtrapolatedPoints"),
+    gemCSCPoints = cms.untracked.InputTag("gemPointProducer","GEMCSCExtrapolatedPoints"),
     EffSaveRootFile = cms.untracked.bool(True),
-    EffRootFileName = cms.untracked.string('Efficiency_MYTEST_Zmu2016B.root'),
+    EffRootFileName = cms.untracked.string('testGEMreso.root'),
     EffSaveRootFileEventsInterval = cms.untracked.int32(100)
 )
 
-process.normfilter = cms.EDFilter("HLTHighLevel",
-    TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
-    HLTPaths = cms.vstring("AlCa_RPCMuonNormalisation*"),
-    eventSetupPathsKey = cms.string(''),
-    andOr = cms.bool(True),
-    throw = cms.bool(True)
-)
 
-process.triggerFilter = cms.EDFilter('TriggerFilter',
-                        gtDigis = cms.untracked.InputTag('hltGtDigis')
-                        #gtDigis = cms.untracked.InputTag('hltGtStage2Digis')
-                        #gtDigis = cms.untracked.InputTag('gtDigis')
-)
-
-# Use this for RPCMonitor stream (Raw Data format)
-#process.p = cms.Path(process.normfilter*process.triggerFilter*process.muonstandalonereco*process.dTandCSCSegmentsinTracks*process.rpcPointProducer*process.museg)
-
-#Use this for Express stream data (FEVT format)
-#process.p = cms.Path(process.triggerFilter*process.muonstandalonereco*process.dTandCSCSegmentsinTracks*process.rpcPointProducer*process.museg)
-
-#Use this with 2016 data - for the moment process.triggerFilter is disabled. The filter needs to be updated regarding to the new triger candidates content 
-
-#import PhysicsTools.PythonAnalysis.LumiList as LumiList
-#process.source.lumisToProcess = LumiList.LumiList(filename = '/afs/cern.ch/work/m/mileva/myGitLab/CMSSW_8_0_7/src/DQM/RPCMonitorModule/test/p86.txt').getVLuminosityBlockRange()
-
-#process.p = cms.Path(process.muonstandalonereco*process.dTandCSCSegmentsinTracks*process.rpcPointProducer*process.museg)
-#process.p = cms.Path(process.dTandCSCSegmentsinTracks*process.rpcPointProducer*process.museg)
-#process.p = cms.Path(process.rpcPointProducer*process.museg)
-process.p = cms.Path(process.gemPointProducer)
+#process.p = cms.Path(process.muonstandalonereco*process.dTandCSCSegmentsinTracks*process.gemPointProducer*process.museg)
+#process.p = cms.Path(process.dTandCSCSegmentsinTracks*process.gemPointProducer*process.museg)
+process.p = cms.Path(process.gemPointProducer*process.museg)	#under test
+#process.p = cms.Path(process.gemPointProducer)	#this step ie working
 
 # Automatic addition of the customisation function from SLHCUpgradeSimulations.Configuration.combinedCustoms
 from SLHCUpgradeSimulations.Configuration.combinedCustoms import cust_2023HGCalMuon
