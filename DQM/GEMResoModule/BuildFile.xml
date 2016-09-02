@@ -1,0 +1,19 @@
+<flags   EDM_PLUGIN="1"/>
+<use   name="FWCore/Framework"/>
+<use   name="FWCore/PluginManager"/>
+<use   name="FWCore/MessageLogger"/>
+<use   name="FWCore/ParameterSet"/>
+<use   name="DataFormats/GEMDigi"/>
+<use   name="DataFormats/GEMRecHit"/>
+<use   name="DQMServices/Core"/>
+<use   name="EventFilter/RPCRawToDigi"/>
+<use   name="Geometry/GEMGeometry"/>
+<use   name="Geometry/CSCGeometry"/>
+<use   name="RecoMuon/DetLayers"/>
+<use   name="FWCore/ServiceRegistry"/>
+<use   name="boost"/>
+<use   name="root"/>
+<use   name="rootgraphics"/>
+<flags   CXXFLAGS="-O0 -g3 -fno-inline"/>
+
+
