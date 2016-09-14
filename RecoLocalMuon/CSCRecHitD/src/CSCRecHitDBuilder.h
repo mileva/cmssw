@@ -92,6 +92,7 @@ class CSCRecHitDBuilder
    * Cache geometry for current event
    */
   const CSCGeometry* geom_;
+  int stationToUse_;
 };
 
 #endif
