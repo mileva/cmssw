@@ -38,23 +38,26 @@ edm::OwnVector<GEMRecHit> GEMRecHitBaseAlgoPreReco::reconstruct(const GEMDetId& 
   for (GEMDigiPreRecoCollection::const_iterator digi = digiRange.first;
        digi != digiRange.second;digi++) {
 
-   std::cout << "inside the digi loop " << std::endl;
+  /// std::cout << "inside the digi loop " << std::endl;
 
     LocalError tmpErr;
     LocalPoint point;
     bool OK = this->compute(*digi,point, tmpErr);
-    std::cout << "compute the digi" << std::endl;
+  ///  std::cout << "compute the digi" << std::endl;
     if (!OK) continue;  
 
     if (recOnlyMuons && std::abs(digi->pdgid()) != 13)  continue;
-     std::cout << "pgd id and recoOnlyMuons" << std::endl;
+ ///    std::cout << "pgd id and recoOnlyMuons" << std::endl;
 
     if (recOnlyPrompt && !digi->prompt()) continue;
-   std::cout << "digi prompt and recoOnlyPrompt" << std::endl;
+ ///  std::cout << "digi prompt and recoOnlyPrompt" << std::endl;
+     int bx = -999;
+     int fCS = -999;
+     int cS = 1;
 
-    GEMRecHit* recHit = new GEMRecHit(gemId,digi->tof(),point,tmpErr);
+    GEMRecHit* recHit = new GEMRecHit(gemId,bx,fCS,cS,digi->tof(),point,tmpErr);
     result.push_back(recHit);
-    std::cout << "rec hit result " << std::endl;
+ ///   std::cout << "rec hit result " << std::endl;
   }
 
   return result;

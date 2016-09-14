@@ -100,6 +100,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
 
   // Pass the EventSetup to the algo
 
+  
   thePreAlgo->setES(setup);
 
   // Iterate through all digi collections ordered by LayerId   
@@ -108,7 +109,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
   for (gempredgIt = predigis->begin(); gempredgIt != predigis->end();
        ++gempredgIt){
 
-     std::cout << " in the pseudo digi loop " << std::endl;       
+   //  std::cout << " in the pseudo digi loop " << std::endl;       
     // The layerId
     const GEMDetId& gemId = (*gempredgIt).first;
 
@@ -119,8 +120,9 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
     // Call the reconstruction algorithm    
 
 //    if(gemId.station() == 2 || gemId.station() == 3){
+
     if(gemId.station() == 3){              ////masking the hits from short station
-     std::cout << "station for pseudo digis = " << gemId.station() << std::endl;
+    // std::cout << "station for pseudo digis = " << gemId.station() << std::endl;
 
     OwnVector<GEMRecHit> recHits =
       thePreAlgo->reconstruct(gemId, range);
@@ -130,6 +132,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
    }
   }
 
+  
 
    // Pass the EventSetup to the algo
     theAlgo->setES(setup);
@@ -153,6 +156,8 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
       EtaPartitionMask mask;
   
      if(gemId.station() == 1){
+     /////changes for testing
+     //if(gemId.station() == 1 || gemId.station() == 3){
    ///  std::cout << "station for real digis = " << gemId.station() << "layer for real digis " << gemId.layer() << std::endl;
 
      OwnVector<GEMRecHit> recHits =
@@ -162,6 +167,7 @@ void GEMRecHitProducerPreReco::produce(Event& event, const EventSetup& setup) {
      recHitCollection->put(gemId, recHits.begin(), recHits.end());
    }
   }
+
 
     event.put(recHitCollection);
 
