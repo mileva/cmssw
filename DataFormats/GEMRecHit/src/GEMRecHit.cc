@@ -58,6 +58,7 @@ GEMRecHit::GEMRecHit(const GEMDetId& gemId,
 {
 }
 
+/*
 GEMRecHit::GEMRecHit(const GEMDetId& gemId, 
                      float tof,
                      const LocalPoint& pos,
@@ -65,7 +66,7 @@ GEMRecHit::GEMRecHit(const GEMDetId& gemId,
   theGEMId(gemId), theTOF(tof), theLocalPosition(pos), theLocalError(err)
 {
 }
-
+*/
 
 
 // Destructor
