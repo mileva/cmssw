@@ -1,30 +1,19 @@
-//#ifndef  CSCSEGTORPC_H
-//#define  CSCSEGTORPC_H
 #ifndef  CSCSEGTOGEM_H
 #define  CSCSEGTOGEM_H
 
-
 #include "FWCore/Framework/interface/EDAnalyzer.h"
-//#include "DataFormats/RPCRecHit/interface/RPCRecHit.h"
-//#include "DataFormats/RPCRecHit/interface/RPCRecHitCollection.h"
 #include "DataFormats/GEMRecHit/interface/GEMRecHit.h"
 #include "DataFormats/GEMRecHit/interface/GEMRecHitCollection.h"
-
 
 //class CSCSegtoRPC {
 class CSCSegtoGEM {
 public:
-//  explicit CSCSegtoRPC(edm::Handle<CSCSegmentCollection> allCSCSegments,const edm::EventSetup& iSetup, const edm::Event& iEvent, bool debug, double eyr);
   explicit CSCSegtoGEM(edm::Handle<CSCSegmentCollection> allCSCSegments,const edm::EventSetup& iSetup, const edm::Event& iEvent, bool debug, double eyr);
-//  ~CSCSegtoRPC();
   ~CSCSegtoGEM();
-//  RPCRecHitCollection* thePoints(){return _ThePoints;}
   GEMRecHitCollection* thePoints(){return _ThePoints;}
    
 private:
-//  RPCRecHitCollection* _ThePoints; 
   GEMRecHitCollection* _ThePoints; 
-//  edm::OwnVector<RPCRecHit> RPCPointVector;
   edm::OwnVector<GEMRecHit> GEMPointVector;
   bool inclcsc;
   double MaxD;
@@ -65,10 +54,8 @@ private:
 class ObjectMapCSC{
 public:
   static ObjectMapCSC* GetInstance(const edm::EventSetup& iSetup);
-//  std::set<RPCDetId> GetRolls(CSCStationIndex cscstationindex){return mapInstance->rollstoreCSC[cscstationindex];}
   std::set<GEMDetId> GetRolls(CSCStationIndex cscstationindex){return mapInstance->rollstoreCSC[cscstationindex];}
 //protected:
-//  std::map<CSCStationIndex,std::set<RPCDetId> > rollstoreCSC;
   std::map<CSCStationIndex,std::set<GEMDetId> > rollstoreCSC;
   ObjectMapCSC(const edm::EventSetup& iSetup);
 private:

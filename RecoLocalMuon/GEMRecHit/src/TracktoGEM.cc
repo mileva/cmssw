@@ -1,6 +1,4 @@
 #include <Geometry/GEMGeometry/interface/GEMGeometry.h>
-#include <Geometry/DTGeometry/interface/DTGeometry.h>
-#include <DataFormats/DTRecHit/interface/DTRecSegment4DCollection.h>
 #include <Geometry/CommonDetUnit/interface/GeomDet.h>
 #include <Geometry/Records/interface/MuonGeometryRecord.h>
 #include <Geometry/CommonTopologies/interface/RectangularStripTopology.h>
@@ -40,15 +38,18 @@ ObjectMap2CSC::ObjectMap2CSC(const edm::EventSetup& iSetup){
 	  int station=gemId.station();
           int ring=gemId.ring();
           int cscring=ring;
-          int cscstation=station;
+          int cscstation=999;
+          if(station==1) cscstation=1;
+          else if(station==2) cscstation=999;
+          else if(station==3) cscstation=2; //GEMDetId.station() == 3 -> GE2/1 long; change this when the convetion is clear, station()==2 should is not relevant
+          else {std::cout << "CSCSegtoGEM: I found station>3" << std::endl; continue;}
 	  int gemsegment = gemId.chamber();
 	  int cscchamber = gemsegment;
 
-          if(! ((station==1||station==2 || station==3) && ring ==1) ) {
-            std::cout << "I found a GEM chamber on the station out of range, station number = " << station << "\tring = " <<cscring << std::endl;
+          if(! ((station==1||station==3) && ring ==1) ) {
+//            std::cout << "I found a GEM chamber on the station out of range, station number = " << station << "\tring = " <<cscring << std::endl;
+            continue;
           }
-//delete the next line after the test
-std::cout << "rumi: check indeces: region = " << region << "cscstation = " << cscstation << "\tcscring = " <<cscring << " cscchamber = "<< cscchamber << std::endl;
 
 	  CSCStationIndex2 ind(region,cscstation,cscring,cscchamber);
           std::set<GEMDetId> myrolls;
@@ -67,9 +68,6 @@ bool TracktoGEM::ValidGEMSurface(GEMDetId gemid, LocalPoint LocalP, const edm::E
   iSetup.get<MuonGeometryRecord>().get(gemGeo);
 
   float locx=LocalP.x(), locy=LocalP.y();//, locz=LocalP.z();
-//   else if(aroll->isForward())
-//   {
-//     const Bounds &rollbound = rpcGeo->idToDet((rpcid))->surface().bounds();
      const Bounds &rollbound = gemGeo->idToDet((gemid))->surface().bounds();
      float boundlength = rollbound.length();
      float boundwidth = rollbound.width();
@@ -140,13 +138,11 @@ for(trackingRecHit_iterator hit=track->recHitsBegin(); hit != track->recHitsEnd(
              TrajectoryMeasurement tMt = trajectory->closestMeasurement(dcPoint);
              TrajectoryStateOnSurface upd2 = (tMt).updatedState();
 
-             if(upd2.isValid() && (cscid.station()==1 || cscid.station()==2 || cscid.station()==3) && cscid.ring()==1 )	//GE21, GE22 and GE11
+             if(upd2.isValid() && (cscid.station()==1 || cscid.station()==2) && cscid.ring()==1 )
              {
                 LocalPoint trajLP = upd2.localPosition();
                 LocalPoint trackLP = (*hit)->localPosition();
                 float dx = trajLP.x()-trackLP.x(), dy=trajLP.y()-trackLP.y();//, dz=trajLP.z()-trackLP.z();
-//rumi: remove the next line after the test
-std::cout << "dx = " << dx << "dy = " << dy << std::endl;
                 if( dx>10. && dy>10.) continue;	//rumi: why?
 
                 ObjectMap2CSC* TheObjectCSC = ObjectMap2CSC::GetInstance(iSetup);
@@ -187,6 +183,9 @@ std::cout << "dx = " << dx << "dy = " << dy << std::endl;
     const GlobalPoint &rGP = gemGeo->idToDet(*gemroll)->surface().toGlobal(LocalPoint(0,0,0));
     int rEn=gemid.region(), rWr=gemid.ring(), rSt=gemid.station(), rCh=gemid.chamber();
 
+    if (rSt == 2) rSt = 999;
+    if (rSt == 3) rSt = 2;  //GEMDetId.station() == 3 -> GE2/1 long; change this when the convetion is clear
+
     if(gemrollCounter[*gemroll]<3) continue ;	//rumi: check what is this: is this the number of rolls per chamber? If yes - fix it to be 8 according to last gem geometry
     
     uint32_t dtcscid=0; double distance= MaxD;
@@ -207,7 +206,7 @@ std::cout << "dx = " << dx << "dy = " << dy << std::endl;
                int En =cscid.endcap(), Ri=cscid.ring(), St=cscid.station(), Ch=cscid.chamber();
                if(En==2) En=-1; if(Ri==4) Ri=1;
 
-               if((rEn-En)==0 && (rSt-St)==0 && (Ch-rCh) ==0 && rWr==1 && (rSt==1 || rSt==2 || rSt==3) && distanceN < distance)	//set this to GE11 and GE21
+               if((rEn-En)==0 && (rSt-St)==0 && (Ch-rCh) ==0 && rWr==1 && (rSt==1 || rSt==2 || rSt==3) && distanceN < distance)	
                {
                    dtcscid=geomDet->geographicalId().rawId();
                    distance = distanceN;

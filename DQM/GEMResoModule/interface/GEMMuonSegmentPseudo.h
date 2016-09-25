@@ -7,7 +7,7 @@
  *
  * \Original author Camilo Carrillo (Uniandes)
  *
- * \Modified for GEM Roumyana Hadjiiska
+ * \Modified for GEM pseudodigis and pseudorechits Roumyana Hadjiiska
  *
 */
 
@@ -39,23 +39,19 @@ class TCanvas;
 class TH2F;
 class TString;
 
-class GEMMuonSegment : public edm::EDAnalyzer {
+class GEMMuonSegmentPseudo : public edm::EDAnalyzer {
    public:
-      explicit GEMMuonSegment(const edm::ParameterSet&);
-      ~GEMMuonSegment();
+      explicit GEMMuonSegmentPseudo(const edm::ParameterSet&);
+      ~GEMMuonSegmentPseudo();
       bool firstbook;
       virtual void beginJob() ;
       virtual void beginRun(const edm::Run&, const edm::EventSetup&);
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob() ;
-      std::map<std::string, MonitorElement*> bookDetUnitSeg(GEMDetId & detId,int nstrips,float stripw,float stripl);
 //add pseudo rechit case
       std::map<std::string, MonitorElement*> bookDetUnitSegPseu(GEMDetId & detId,float rollw,float stripl);
-
       std::string GEMname(const GEMDetId&);
-
       virtual void endRun(const edm::Run& r, const edm::EventSetup& iSetup);
-      std::map<int,float> alignmentinfo;
       
       edm::ESHandle<GEMGeometry> gemGeo;
       edm::ESHandle<CSCGeometry> cscGeo;
@@ -64,12 +60,12 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       MonitorElement * stationstatistics;
 
       //Ang Dependence
-      MonitorElement * ScatterPlotAngCLSEndcaps;
-      MonitorElement * AngClu1Endcaps;
-      MonitorElement * AngClu2Endcaps;
-      MonitorElement * AngClu3Endcaps;
+      MonitorElement * AngSigma1Endcaps;
+      MonitorElement * AngSigma2Endcaps;
+      MonitorElement * AngSigma3Endcaps;
+      MonitorElement * AngSigmaAnyEndcaps;
       
-      //Residuals Endcap
+      //Residuals
 //Endcap GE11
       MonitorElement *hGlobalResAllClsGE11_1;
       MonitorElement *hGlobalResAllClsGE11_2;
@@ -80,33 +76,6 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       MonitorElement *hGlobalResAllClsGE11_7;
       MonitorElement *hGlobalResAllClsGE11_8;
 
-      MonitorElement * hGlobalResClu1GE11_1;
-      MonitorElement * hGlobalResClu1GE11_2;
-      MonitorElement * hGlobalResClu1GE11_3;
-      MonitorElement * hGlobalResClu1GE11_4;
-      MonitorElement * hGlobalResClu1GE11_5;
-      MonitorElement * hGlobalResClu1GE11_6;
-      MonitorElement * hGlobalResClu1GE11_7;
-      MonitorElement * hGlobalResClu1GE11_8;
-
-      MonitorElement * hGlobalResClu2GE11_1;
-      MonitorElement * hGlobalResClu2GE11_2;
-      MonitorElement * hGlobalResClu2GE11_3;
-      MonitorElement * hGlobalResClu2GE11_4;
-      MonitorElement * hGlobalResClu2GE11_5;
-      MonitorElement * hGlobalResClu2GE11_6;
-      MonitorElement * hGlobalResClu2GE11_7;
-      MonitorElement * hGlobalResClu2GE11_8;
-
-      MonitorElement * hGlobalResClu3GE11_1;
-      MonitorElement * hGlobalResClu3GE11_2;
-      MonitorElement * hGlobalResClu3GE11_3;
-      MonitorElement * hGlobalResClu3GE11_4;
-      MonitorElement * hGlobalResClu3GE11_5;
-      MonitorElement * hGlobalResClu3GE11_6;
-      MonitorElement * hGlobalResClu3GE11_7;
-      MonitorElement * hGlobalResClu3GE11_8;
-
 //Endcap GE21
       MonitorElement *hGlobalResAllClsGE21_1;
       MonitorElement *hGlobalResAllClsGE21_2;
@@ -116,33 +85,6 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       MonitorElement *hGlobalResAllClsGE21_6;
       MonitorElement *hGlobalResAllClsGE21_7;
       MonitorElement *hGlobalResAllClsGE21_8;
-
-      MonitorElement * hGlobalResClu1GE21_1;
-      MonitorElement * hGlobalResClu1GE21_2;
-      MonitorElement * hGlobalResClu1GE21_3;
-      MonitorElement * hGlobalResClu1GE21_4;
-      MonitorElement * hGlobalResClu1GE21_5;
-      MonitorElement * hGlobalResClu1GE21_6;
-      MonitorElement * hGlobalResClu1GE21_7;
-      MonitorElement * hGlobalResClu1GE21_8;
-
-      MonitorElement * hGlobalResClu2GE21_1;
-      MonitorElement * hGlobalResClu2GE21_2;
-      MonitorElement * hGlobalResClu2GE21_3;
-      MonitorElement * hGlobalResClu2GE21_4;
-      MonitorElement * hGlobalResClu2GE21_5;
-      MonitorElement * hGlobalResClu2GE21_6;
-      MonitorElement * hGlobalResClu2GE21_7;
-      MonitorElement * hGlobalResClu2GE21_8;
-
-      MonitorElement * hGlobalResClu3GE21_1;
-      MonitorElement * hGlobalResClu3GE21_2;
-      MonitorElement * hGlobalResClu3GE21_3;
-      MonitorElement * hGlobalResClu3GE21_4;
-      MonitorElement * hGlobalResClu3GE21_5;
-      MonitorElement * hGlobalResClu3GE21_6;
-      MonitorElement * hGlobalResClu3GE21_7;
-      MonitorElement * hGlobalResClu3GE21_8;
 
 //Endcap GE22
       MonitorElement *hGlobalResAllClsGE22_1;
@@ -158,44 +100,19 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       MonitorElement *hGlobalResAllClsGE22_11;
       MonitorElement *hGlobalResAllClsGE22_12;
 
-      MonitorElement * hGlobalResClu1GE22_1;
-      MonitorElement * hGlobalResClu1GE22_2;
-      MonitorElement * hGlobalResClu1GE22_3;
-      MonitorElement * hGlobalResClu1GE22_4;
-      MonitorElement * hGlobalResClu1GE22_5;
-      MonitorElement * hGlobalResClu1GE22_6;
-      MonitorElement * hGlobalResClu1GE22_7;
-      MonitorElement * hGlobalResClu1GE22_8;
-      MonitorElement * hGlobalResClu1GE22_9;
-      MonitorElement * hGlobalResClu1GE22_10;
-      MonitorElement * hGlobalResClu1GE22_11;
-      MonitorElement * hGlobalResClu1GE22_12;
-
-      MonitorElement * hGlobalResClu2GE22_1;
-      MonitorElement * hGlobalResClu2GE22_2;
-      MonitorElement * hGlobalResClu2GE22_3;
-      MonitorElement * hGlobalResClu2GE22_4;
-      MonitorElement * hGlobalResClu2GE22_5;
-      MonitorElement * hGlobalResClu2GE22_6;
-      MonitorElement * hGlobalResClu2GE22_7;
-      MonitorElement * hGlobalResClu2GE22_8;
-      MonitorElement * hGlobalResClu2GE22_9;
-      MonitorElement * hGlobalResClu2GE22_10;
-      MonitorElement * hGlobalResClu2GE22_11;
-      MonitorElement * hGlobalResClu2GE22_12;
-
-      MonitorElement * hGlobalResClu3GE22_1;
-      MonitorElement * hGlobalResClu3GE22_2;
-      MonitorElement * hGlobalResClu3GE22_3;
-      MonitorElement * hGlobalResClu3GE22_4;
-      MonitorElement * hGlobalResClu3GE22_5;
-      MonitorElement * hGlobalResClu3GE22_6;
-      MonitorElement * hGlobalResClu3GE22_7;
-      MonitorElement * hGlobalResClu3GE22_8;
-      MonitorElement * hGlobalResClu3GE22_9;
-      MonitorElement * hGlobalResClu3GE22_10;
-      MonitorElement * hGlobalResClu3GE22_11;
-      MonitorElement * hGlobalResClu3GE22_12;
+//Endcap GE22 delta phi
+      MonitorElement *hGlobphiResAllGE22_1;
+      MonitorElement *hGlobphiResAllGE22_2;
+      MonitorElement *hGlobphiResAllGE22_3;
+      MonitorElement *hGlobphiResAllGE22_4;
+      MonitorElement *hGlobphiResAllGE22_5;
+      MonitorElement *hGlobphiResAllGE22_6;
+      MonitorElement *hGlobphiResAllGE22_7;
+      MonitorElement *hGlobphiResAllGE22_8;
+      MonitorElement *hGlobphiResAllGE22_9;
+      MonitorElement *hGlobphiResAllGE22_10;
+      MonitorElement *hGlobphiResAllGE22_11;
+      MonitorElement *hGlobphiResAllGE22_12;
 
 //XY_view plots
       MonitorElement * XY_globalGE11;
@@ -220,8 +137,6 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       bool debug;
       bool paper;
       bool inves;
-      bool manualalignment;
-      double rangestrips;
       int dupli;
       
       std::string rejected;
@@ -236,8 +151,6 @@ class GEMMuonSegment : public edm::EDAnalyzer {
       
       bool EffSaveRootFile;
       std::string EffRootFileName;
-      std::string AlignmentinfoFile;
       std::string nameInLog;
-
       DQMStore * dbe;
 };

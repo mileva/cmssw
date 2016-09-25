@@ -22,9 +22,9 @@
      myStream.str("");
  
      if(detId.region() == -1) 
-       myStream <<"Endcap-/Disk_-"<<detId.station()<<"/ring_"<<detId.ring()<<"/chamber_"<<detId.chamber();
+       myStream <<"Endcap-/Station_-"<<detId.station()<<"/ring_"<<detId.ring()<<"/chamber_"<<detId.chamber();
      else if(detId.region() ==  1) 
-       myStream <<"Endcap+/Disk_"<<detId.station()<<"/ring_"<<detId.ring()<<"/chamber_"<<detId.chamber();
+       myStream <<"Endcap+/Station_"<<detId.station()<<"/ring_"<<detId.ring()<<"/chamber_"<<detId.chamber();
      else  myStream <<"Error/Folder/Creation";
  
        return myStream.str();

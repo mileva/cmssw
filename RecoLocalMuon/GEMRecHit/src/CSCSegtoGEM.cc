@@ -1,5 +1,4 @@
 #include <Geometry/GEMGeometry/interface/GEMGeometry.h>
-
 #include <Geometry/CSCGeometry/interface/CSCGeometry.h>
 #include <DataFormats/CSCRecHit/interface/CSCSegmentCollection.h>
 #include <Geometry/CommonDetUnit/interface/GeomDet.h>
@@ -7,13 +6,11 @@
 #include <Geometry/CommonTopologies/interface/TrapezoidalStripTopology.h>
 #include <FWCore/Framework/interface/EDAnalyzer.h>
 #include "FWCore/Framework/interface/ESHandle.h"
-
-//#include <Geometry/RPCGeometry/interface/RPCGeomServ.h>
-//is there a similar GEM class?
-
 #include <DataFormats/GEMRecHit/interface/GEMRecHit.h>
 #include <DataFormats/GEMRecHit/interface/GEMRecHitCollection.h>
 #include <RecoLocalMuon/GEMRecHit/interface/CSCSegtoGEM.h>
+
+#include "Geometry/GEMGeometry/interface/GEMEtaPartitionSpecs.h"
 
 ObjectMapCSC* ObjectMapCSC::mapInstance = NULL;
 
@@ -42,17 +39,20 @@ ObjectMapCSC::ObjectMapCSC(const edm::EventSetup& iSetup){
 	  int station=gemId.station();
           int ring=gemId.ring();
           int cscring=ring;
-          int cscstation=station;
-
+          int cscstation=999;
+          if(station==1) cscstation=1;
+          else if(station==2) cscstation=999;
+          else if(station==3) cscstation=2; //GEMDetId.station() == 3 -> GE2/1 long; change this when the convetion is clear, station()==2 should is not relevant
+          else {std::cout << "CSCSegtoGEM: I found station>3" << std::endl; continue;}
           int gemsegment = gemId.chamber();
 	  int cscchamber = gemsegment;
 
-          if(! ((station==1||station==2 || station==3) && ring ==1) ) {
-            std::cout << "I found a GEM chamber on the station out of range, station number = " << station << "\tring = " <<cscring << std::endl;
+          if(! ((station==1||station==3) && ring ==1) ) {
+//            std::cout << "I found a GEM chamber on the station out of range, station number = " << station << "\tring = " <<cscring << std::endl;
+            continue;
           }
+
 	  CSCStationIndex ind(region,cscstation,cscring,cscchamber);
-//delete the next line after the test
-std::cout << "rumi: check indeces: region = " << region << "cscstation = " << cscstation << "\tcscring = " <<cscring << " cscchamber = "<< cscchamber << std::endl;
           std::set<GEMDetId> myrolls;
 	  if (rollstoreCSC.find(ind)!=rollstoreCSC.end()) myrolls=rollstoreCSC[ind];
 	  myrolls.insert(gemId);
@@ -151,8 +151,7 @@ CSCSegtoGEM::CSCSegtoGEM(edm::Handle<CSCSegmentCollection> allCSCSegments, const
 
 	  if(debug) std::cout<<"CSC \t \t Printing The Id"<<TheId<<std::endl;
 
-	  if(gemRing==1 && (gemStation==2 || gemStation==1 || gemStation==3)){//GE11, GE21, GE22
-	  
+	  if(gemRing==1 && (gemStation==2 || gemStation==1)){
 	    assert(rollsForThisCSC.size()>=1);
 
 	    if(debug) std::cout<<"CSC \t \t Loop over all the rolls asociated to this CSC"<<std::endl;	    
@@ -162,8 +161,8 @@ CSCSegtoGEM::CSCSegtoGEM(edm::Handle<CSCSegmentCollection> allCSCSegments, const
 	      GEMDetId gemId = rollasociated->id();
 		
 	      if(debug) std::cout<<"CSC \t \t \t We are in the roll getting the surface"<<gemId<<std::endl;
-	      const BoundPlane & GEMSurface = rollasociated->surface(); 
 
+	      const BoundPlane & GEMSurface = rollasociated->surface(); 
 	      if(debug) std::cout<<"CSC \t \t \t RollID: "<<gemId<<std::endl;
 	      if(debug) std::cout<<"CSC \t \t \t Doing the extrapolation to this roll"<<std::endl;
 	      if(debug) std::cout<<"CSC \t \t \t CSC Segment Direction in CSCLocal "<<segmentDirection<<std::endl;
@@ -226,6 +225,20 @@ CSCSegtoGEM::CSCSegtoGEM(edm::Handle<CSCSegmentCollection> allCSCSegments, const
 	      if(debug) std::cout<<"CSC \t \t \t Roll Size "<<rsize<<"cm"<<std::endl;
 	      float stripl = top_->stripLength();
 	      float stripw = top_->pitch();
+
+//pseudo granularity case
+	      auto& parameters(rollasociated->specs()->parameters());
+	      float bottomLength(parameters[0]); bottomLength = 2*bottomLength;
+	      float topLength(parameters[1]);    topLength    = 2*topLength;
+	      float height(parameters[2]);       height       = 2*height;
+
+	      bool usePseudoRechits = true;	//put the next two as congif parameters
+	      int pseudoStation = 3;
+	      if (usePseudoRechits && gemId.station() == pseudoStation)
+	      {
+	        stripl = height;
+	        rsize = (topLength + bottomLength) / 2.0;
+	      }
 
 	      if(debug) std::cout<<"CSC \t \t \t Strip Lenght "<<stripl<<"cm"<<std::endl;
 	      if(debug) std::cout<<"CSC \t \t \t Strip Width "<<stripw<<"cm"<<std::endl;
