@@ -48,12 +48,14 @@ edm::OwnVector<GEMRecHit> GEMRecHitBaseAlgo::reconstruct(const GEMEtaPartition& 
     LocalPoint point;
     // Call the compute method
     bool OK = this->compute(roll, *cl, point, tmpErr);
+     std::cout << "compute the real digi" << std::endl;
     if (!OK) continue;
 
     // Build a new pair of 1D rechit 
     int firstClustStrip= cl->firstStrip();
-    int clusterSize=cl->clusterSize(); 
-    GEMRecHit*  recHit = new GEMRecHit(gemId,cl->bx(),firstClustStrip,clusterSize,point,tmpErr);
+    int clusterSize=cl->clusterSize();
+    float tof = 0.0; 
+    GEMRecHit*  recHit = new GEMRecHit(gemId,cl->bx(),firstClustStrip,clusterSize,tof,point,tmpErr);
 
 
     result.push_back(recHit);

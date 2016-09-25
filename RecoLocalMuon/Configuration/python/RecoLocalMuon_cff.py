@@ -24,7 +24,14 @@ from CalibMuon.CSCCalibration.CSCIndexer_cfi import *
 #------------------------------------ RPC -----------------------------------------------
 # 1D RecHits
 from RecoLocalMuon.RPCRecHit.rpcRecHits_cfi import *
-#----------------------------------------------------------------------------------------
+
+#---------------------------------GEM RecHits and Segments-------------------------------------------------------
+#from RecoLocalMuon.GEMRecHit.gemRecHitsPreReco_cfi import *
+from RecoLocalMuon.GEMRecHit.gemRecHits_cfi import *
+#from RecoLocalMuon.GEMSegment.gemSegments_cfi import *
+#from RecoLocalMuon.GEMSegment.gemPreSegments_cfi import *
+
+
 # DT sequence for the standard reconstruction chain 
 # The reconstruction of the 2D segments are not required for the 4D segments reconstruction, they are used
 # only for debuging purpose and for specific studies
@@ -37,4 +44,5 @@ csclocalreco = cms.Sequence(csc2DRecHits*cscSegments)
 # DT, CSC and RPC together
 muonlocalreco_with_2DSegments = cms.Sequence(dtlocalreco_with_2DSegments+csclocalreco+rpcRecHits)
 # DT, CSC and RPC together (correct sequence for the standard path)
-muonlocalreco = cms.Sequence(dtlocalreco+csclocalreco+rpcRecHits)
+#muonlocalreco = cms.Sequence(dtlocalreco+csclocalreco+rpcRecHits+gemRecHits+gemRecHitsPreReco+gemSegments+gemPreSegments)
+muonlocalreco = cms.Sequence(dtlocalreco+csclocalreco+rpcRecHits+gemRecHits)

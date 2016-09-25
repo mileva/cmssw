@@ -11,15 +11,19 @@
 
 
 GEMRecHit::GEMRecHit(const GEMDetId& gemId, int bx) :  RecHit2DLocalPos(gemId),
-  theGEMId(gemId), theBx(bx),theFirstStrip(99),theClusterSize(99), theLocalPosition(), theLocalError() 
+  theGEMId(gemId), theBx(bx), theFirstStrip(99),theClusterSize(99), theLocalPosition(), theLocalError() 
 {
 }
 
 GEMRecHit::GEMRecHit() :  RecHit2DLocalPos(),
-  theGEMId(), theBx(99),theFirstStrip(99),theClusterSize(99), theLocalPosition(), theLocalError() 
+  theGEMId(), theBx(99), theFirstStrip(99),theClusterSize(99), theTOF(0.),theLocalPosition(), theLocalError() 
 {
 }
 
+//GEMRecHit::GEMRecHit() :  RecHit2DLocalPos(),
+//  theGEMId(), theTOF(0.), theLocalPosition(), theLocalError()
+//{
+//}
 
 GEMRecHit::GEMRecHit(const GEMDetId& gemId, int bx, const LocalPoint& pos) :  RecHit2DLocalPos(gemId),
   theGEMId(gemId), theBx(bx), theFirstStrip(99),theClusterSize(99), theLocalPosition(pos) 
@@ -34,26 +38,35 @@ GEMRecHit::GEMRecHit(const GEMDetId& gemId, int bx, const LocalPoint& pos) :  Re
 
 // Constructor from a local position and error, wireId and digi time.
 GEMRecHit::GEMRecHit(const GEMDetId& gemId,
-		     int bx,
+		     int bx,                  
 		     const LocalPoint& pos,
 		     const LocalError& err) :  RecHit2DLocalPos(gemId),
-  theGEMId(gemId), theBx(bx),theFirstStrip(99), theClusterSize(99), theLocalPosition(pos), theLocalError(err) 
+  theGEMId(gemId), theBx(bx), theFirstStrip(99), theClusterSize(99), theLocalPosition(pos), theLocalError(err) 
 {
 }
 
 
 // Constructor from a local position and error, wireId, bx and cluster size.
 GEMRecHit::GEMRecHit(const GEMDetId& gemId,
-		     int bx,
+		     int bx,                  
 		     int firstStrip,
 		     int clustSize,
+                     float tof,
 		     const LocalPoint& pos,
 		     const LocalError& err) :  RecHit2DLocalPos(gemId),
-  theGEMId(gemId), theBx(bx),theFirstStrip(firstStrip), theClusterSize(clustSize), theLocalPosition(pos), theLocalError(err) 
+  theGEMId(gemId), theBx(bx), theFirstStrip(firstStrip), theClusterSize(clustSize), theTOF(tof), theLocalPosition(pos), theLocalError(err) 
 {
 }
 
-
+/*
+GEMRecHit::GEMRecHit(const GEMDetId& gemId, 
+                     float tof,
+                     const LocalPoint& pos,
+		     const LocalError& err) :  RecHit2DLocalPos(gemId),
+  theGEMId(gemId), theTOF(tof), theLocalPosition(pos), theLocalError(err)
+{
+}
+*/
 
 
 // Destructor
