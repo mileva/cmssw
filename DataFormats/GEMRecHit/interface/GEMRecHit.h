@@ -48,11 +48,12 @@ class GEMRecHit : public RecHit2DLocalPos {
 	    const LocalPoint& pos,
 	    const LocalError& err);
 
-
+/*
   GEMRecHit(const GEMDetId& gemId,
             float tof,
             const LocalPoint& pos,
             const LocalError& err);
+*/
   
   /// Destructor
   virtual ~GEMRecHit();
