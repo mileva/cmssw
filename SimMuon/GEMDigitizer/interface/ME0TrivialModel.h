@@ -16,6 +16,7 @@ class ME0Geometry;
 namespace CLHEP
 {
   class HepRandomEngine;
+  class RandFlat;
 }
 
 class ME0TrivialModel: public ME0DigiModel

@@ -6,6 +6,9 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include "CLHEP/Random/RandomEngine.h"
+#include "CLHEP/Random/RandFlat.h"
+
 #include <cmath>
 #include <utility>
 #include <map>

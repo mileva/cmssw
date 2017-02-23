@@ -28,6 +28,17 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10)
 )
 
+## customization of the process.pdigi sequence to add the GEM digitizer 
+#from SimMuon.GEMDigitizer.customizeGEMDigi import customize_digi_addGEM_muon_only
+#process = customize_digi_addGEM_muon_only(process) 
+
+process.load('SimMuon.GEMDigitizer.muonME0DigiTrivial_cfi')
+process.RandomNumberGeneratorService.simMuonME0TrivDigis = cms.PSet(
+    initialSeed = cms.untracked.uint32(123456798),
+    engineName = cms.untracked.string('HepJamesRandom')
+    )
+
+
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
