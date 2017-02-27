@@ -1,7 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 from SimGeneral.MixingModule.aliases_cfi import * 
-# from SimGeneral.MixingModule.mixObjects_cfi import *
+# rumi new line inserted
+from SimGeneral.MixingModule.mixObjects_cfi import *
 # from SimGeneral.MixingModule.digitizers_cfi import *
 from SimGeneral.MixingModule.pixelDigitizer_cfi import *
 from SimGeneral.MixingModule.stripDigitizer_cfi import *

@@ -18,7 +18,6 @@
 <use   name="Geometry/CommonDetUnit"/>
 <use   name="Geometry/Records"/>
 <use   name="Geometry/GEMGeometry"/>
-<use   name="Geometry/ME0Geometry"/>
 <use   name="PhysicsTools/UtilAlgos"/>
 <use   name="RelationalAccess"/>
 <use   name="root"/>

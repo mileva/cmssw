@@ -1,5 +1,5 @@
-#ifndef DataFormats_ME0Digi_ME0Digi_h
-#define DataFormats_ME0Digi_ME0Digi_h
+#ifndef DataFormats_GEMDigi_ME0Digi_h
+#define DataFormats_GEMDigi_ME0Digi_h
 
 /** \class ME0Digi
  *

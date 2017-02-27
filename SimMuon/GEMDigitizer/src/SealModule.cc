@@ -42,3 +42,6 @@ DEFINE_FWK_MODULE(ME0DigiProducer);
 #include "SimMuon/GEMDigitizer/interface/ME0TrivialModel.h"
 DEFINE_EDM_PLUGIN(ME0DigiModelFactory, ME0TrivialModel, "ME0TrivialModel");
 
+#include "SimMuon/GEMDigitizer/interface/ME0SimpleModel.h"
+DEFINE_EDM_PLUGIN(ME0DigiModelFactory, ME0SimpleModel, "ME0SimpleModel");
+

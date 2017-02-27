@@ -11,7 +11,7 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/EventSetup.h"
-#include "DataFormats/ME0Digi/interface/ME0DigiCollection.h"
+#include "DataFormats/GEMDigi/interface/ME0DigiCollection.h"
 #include "DataFormats/Common/interface/DetSet.h"
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "SimDataFormats/TrackerDigiSimLink/interface/StripDigiSimLink.h"

@@ -107,5 +107,6 @@ void ME0DigiProducer::produce(edm::Event& e, const edm::EventSetup& eventSetup)
   e.put(std::move(digis));
   e.put(std::move(stripDigiSimLinks),"ME0");
 //  e.put(std::move(ME0DigiSimLinks),"ME0");	//rumi: to be implemented
+std::cout << "producer moved" << std::endl;
 }
 

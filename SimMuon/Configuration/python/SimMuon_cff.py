@@ -14,7 +14,8 @@ from SimMuon.DTDigitizer.muondtdigi_cfi import *
 from SimMuon.RPCDigitizer.muonrpcdigi_cfi import *
 muonDigi = cms.Sequence(simMuonCSCDigis+simMuonDTDigis+simMuonRPCDigis)
 
-from CondCore.DBCommon.CondDBCommon_cfi import *
+#from CondCore.DBCommon.CondDBCommon_cfi import *
+from CondCore.CondDB.CondDB_cfi import *
 
 from SimMuon.GEMDigitizer.muonGEMDigi_cff import *
 from SimMuon.GEMDigitizer.muonME0Digi_cff import *
@@ -29,7 +30,8 @@ _phase2_muonDigi += simMuonME0TrivDigis		#rumi: adding realistic ME0digis
 
 def _modifySimMuonForPhase2( theProcess ):
     theProcess.rpcphase2recovery_essource = cms.ESSource("PoolDBESSource",
-         CondDBCommon,
+         CondDB,
+#         CondDBCommon,
          #    using CondDBSetup
          toGet = cms.VPSet(cms.PSet(
              record = cms.string("RPCStripNoisesRcd"),             
