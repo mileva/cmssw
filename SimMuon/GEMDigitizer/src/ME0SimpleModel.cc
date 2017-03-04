@@ -85,8 +85,8 @@ void ME0SimpleModel::simulateSignal(const ME0EtaPartition* roll, const edm::PSim
   detectorHitMap_.clear();
   stripDigiSimLinks_ = StripDigiSimLinks(roll->id().rawId());
 
-//  theME0DigiSimLinks_.clear();
-//  theME0DigiSimLinks_ = ME0DigiSimLinks(roll->id().rawId());
+  theME0DigiSimLinks_.clear();
+  theME0DigiSimLinks_ = ME0DigiSimLinks(roll->id().rawId());
   bool digiMuon = false;
   bool digiElec = false;
   for (edm::PSimHitContainer::const_iterator hit = simHits.begin(); hit != simHits.end(); ++hit)

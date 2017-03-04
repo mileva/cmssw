@@ -15,7 +15,7 @@
 #include "DataFormats/Common/interface/DetSet.h"
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "SimDataFormats/TrackerDigiSimLink/interface/StripDigiSimLink.h"
-//#include "SimDataFormats/ME0DigiSimLink/interface/ME0DigiSimLink.h"	//rumi: to be implemented
+#include "SimDataFormats/ME0DigiSimLink/interface/ME0DigiSimLink.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 
 #include <map>
@@ -34,7 +34,7 @@ class ME0DigiModel
 public:
 
   typedef edm::DetSet<StripDigiSimLink> StripDigiSimLinks;
-//  typedef edm::DetSet<ME0DigiSimLink> ME0DigiSimLinks;	//rumi:to be implemented
+  typedef edm::DetSet<ME0DigiSimLink> ME0DigiSimLinks;
 
   virtual ~ME0DigiModel() {}
 
@@ -54,7 +54,7 @@ public:
   virtual void setup() = 0;
 
   const StripDigiSimLinks & stripDigiSimLinks() const {return stripDigiSimLinks_;}
-//  const ME0DigiSimLinks & ME0DigiSimLinks() const {return theME0DigiSimLinks_;}	//rumi: to be implemented
+  const ME0DigiSimLinks & me0DigiSimLinks() const {return theME0DigiSimLinks_;}
 
 protected:
 
@@ -77,7 +77,7 @@ protected:
 
   DetectorHitMap detectorHitMap_;
   StripDigiSimLinks stripDigiSimLinks_;
-//  ME0DigiSimLinks theME0DigiSimLinks_;	//rumi: to be implemented
+  ME0DigiSimLinks theME0DigiSimLinks_;
 
 };
 #endif

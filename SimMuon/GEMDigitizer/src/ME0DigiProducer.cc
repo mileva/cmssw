@@ -31,7 +31,7 @@ ME0DigiProducer::ME0DigiProducer(const edm::ParameterSet& ps)
 {
   produces<ME0DigiCollection>();
   produces<StripDigiSimLinks>("ME0");
-//  produces<ME0DigiSimLinks>("ME0");	//rumi: to be implemented
+  produces<ME0DigiSimLinks>("ME0");
 
   edm::Service<edm::RandomNumberGenerator> rng;
   if (!rng.isAvailable()){
@@ -77,7 +77,7 @@ void ME0DigiProducer::produce(edm::Event& e, const edm::EventSetup& eventSetup)
   // Create empty output
   std::unique_ptr<ME0DigiCollection> digis(new ME0DigiCollection());
   std::unique_ptr<StripDigiSimLinks> stripDigiSimLinks(new StripDigiSimLinks() );
-//  std::unique_ptr<ME0DigiSimLinks> ME0DigiSimLinks(new ME0DigiSimLinks() );	//rumi: to be implemented
+  std::unique_ptr<ME0DigiSimLinks> me0DigiSimLinks(new ME0DigiSimLinks() );
 
   // arrange the hits by eta partition
   std::map<uint32_t, edm::PSimHitContainer> hitMap;
@@ -100,13 +100,12 @@ void ME0DigiProducer::produce(edm::Event& e, const edm::EventSetup& eventSetup)
     ME0DigiModel_->simulateNoise(roll, engine);
     ME0DigiModel_->fillDigis(rawId, *digis);
     (*stripDigiSimLinks).insert(ME0DigiModel_->stripDigiSimLinks());
-//    (*ME0DigiSimLinks).insert(ME0DigiModel_->ME0DigiSimLinks());	 //rumi: to be implemented
+    (*me0DigiSimLinks).insert(ME0DigiModel_->me0DigiSimLinks());
   }
 
   // store them in the event
   e.put(std::move(digis));
   e.put(std::move(stripDigiSimLinks),"ME0");
-//  e.put(std::move(ME0DigiSimLinks),"ME0");	//rumi: to be implemented
-std::cout << "producer moved" << std::endl;
+  e.put(std::move(me0DigiSimLinks),"ME0");
 }
 

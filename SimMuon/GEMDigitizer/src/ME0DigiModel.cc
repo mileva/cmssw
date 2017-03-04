@@ -11,8 +11,8 @@ ME0DigiModel::fillDigis(int rollDetId, ME0DigiCollection& digis)
     // (strip, bx)
     ME0Digi digi(d.first, d.second); 
     digis.insertDigi(ME0DetId(rollDetId), digi);
-    addLinks(d.first, d.second);	//rumi: stripdigisimlink
-//    addLinksWithPartId(d.first, d.second);	//rumi: to be implemented
+    addLinks(d.first, d.second);
+    addLinksWithPartId(d.first, d.second);
   }
   strips_.clear();
 }
@@ -57,7 +57,6 @@ ME0DigiModel::addLinks(unsigned int strip, int bx)
   }
 }
 
-/* rumi: to be implemented
 void ME0DigiModel::addLinksWithPartId(unsigned int strip, int bx)
 {
  
@@ -76,5 +75,4 @@ void ME0DigiModel::addLinksWithPartId(unsigned int strip, int bx)
 
   }
 }
-*/
 

@@ -10,7 +10,7 @@
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "SimDataFormats/CrossingFrame/interface/MixCollection.h"
 #include "SimDataFormats/TrackerDigiSimLink/interface/StripDigiSimLink.h"
-//#include "SimDataFormats/ME0DigiSimLink/interface/ME0DigiSimLink.h"	//rumi: to be implemented
+#include "SimDataFormats/ME0DigiSimLink/interface/ME0DigiSimLink.h"
 
 #include <string>
 
@@ -23,7 +23,7 @@ public:
 
   typedef edm::DetSetVector<StripDigiSimLink> StripDigiSimLinks;
   
-//  typedef edm::DetSetVector<ME0DigiSimLink> ME0DigiSimLinks;	//rumi: to be implemented
+  typedef edm::DetSetVector<ME0DigiSimLink> ME0DigiSimLinks;
 
   explicit ME0DigiProducer(const edm::ParameterSet& ps);
 
