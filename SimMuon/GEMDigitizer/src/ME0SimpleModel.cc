@@ -119,7 +119,6 @@ void ME0SimpleModel::simulateSignal(const ME0EtaPartition* roll, const edm::PSim
     {
       detectorHitMap_.insert(DetectorHitMap::value_type(digi,&*(hit)));
       strips_.insert(digi);
-std::cout << "inseted " << std::endl;
     }
   }
 }

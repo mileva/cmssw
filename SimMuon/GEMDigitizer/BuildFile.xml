@@ -7,7 +7,6 @@
 <use   name="DataFormats/MuonDetId"/>
 <use   name="DataFormats/Provenance"/>
 <use   name="DataFormats/GEMDigi"/>
-<use   name="DataFormats/ME0Digi"/>
 <use   name="FWCore/Catalog"/>
 <use   name="FWCore/Framework"/>
 <use   name="FWCore/MessageLogger"/>
