@@ -13,7 +13,6 @@ process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
 process.load('Configuration.StandardSequences.Digi_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
-
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '90X_upgrade2023_realistic_v1', '')
@@ -26,20 +25,11 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-#process.Tracer = cms.Service("Tracer")
-
-process.dumper = cms.EDAnalyzer("ME0DigiSimLinkReader",
+process.dumper = cms.EDAnalyzer("ME0DigiReader",
     simhitToken = cms.InputTag("g4SimHits","MuonME0Hits"), 
     me0DigiToken = cms.InputTag("simMuonME0TrivDigis"), 
-    me0DigiSimLinkToken = cms.InputTag("simMuonME0TrivDigis","ME0") ,
-    debugFlag = cms.bool(False)#,	#for Milena: add a comma in the end of the line
-#forMilena
-#    rechitToken = cms.InputTag("me0RecHits","")
-#forMilena end
+    me0StripDigiSimLinkToken = cms.InputTag("simMuonME0TrivDigis","ME0") 
 )
 
-process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('testME0DigiSimLink.root')
-)
+process.p    = cms.Path(process.dumper)
 
-process.p = cms.Path(process.dumper)
