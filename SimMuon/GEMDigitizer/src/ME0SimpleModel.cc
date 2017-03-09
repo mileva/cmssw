@@ -37,37 +37,18 @@ ME0DigiModel(config)
 , simulateLowNeutralRate_(config.getParameter<bool>("simulateLowNeutralRate"))
 {
 //initialise parameters from the fit:
-//params for pol3 model of electron bkg for GE1/1:
-  GE11ElecBkgParam0 = 3402.63;
-  GE11ElecBkgParam1 = -42.9979;
-  GE11ElecBkgParam2 = 0.188475;
-  GE11ElecBkgParam3 = -0.0002822;
-//params for expo model of electron bkg for GE2/1:
-  constElecGE21 = 9.74156e+02;
-  slopeElecGE21 = -1.18398e-02;
-//Neutral Bkg
+//params for pol3 model of electron bkg for ME0 (GE1/1):
+  ME0ElecBkgParam0 = 3402.63;
+  ME0ElecBkgParam1 = -42.9979;
+  ME0ElecBkgParam2 = 0.188475;
+  ME0ElecBkgParam3 = -0.0002822;
 //Low Rate model L=10^{34}cm^{-2}s^{-1}
-//const and slope for the expo model of neutral bkg for GE1/1:
-  constNeuGE11 = 807.;
-  slopeNeuGE11 = -0.01443;
-//params for the simple pol5 model of neutral bkg for GE2/1:
-  GE21NeuBkgParam0 = 2954.04;
-  GE21NeuBkgParam1 = -58.7558;
-  GE21NeuBkgParam2 = 0.473481;
-  GE21NeuBkgParam3 = -0.00188292;
-  GE21NeuBkgParam4 = 3.67041e-06;
-  GE21NeuBkgParam5 = -2.80261e-09;
-//High Rate model L=5x10^{34}cm^{-2}s^{-1}
-//params for expo model of neutral bkg for GE1/1:
-  constNeuGE11_highRate = 1.02603e+04;
-  slopeNeuGE11_highRate = -1.62806e-02;
-//params for pol5 model of neutral bkg for GE2/1:
-  GE21ModNeuBkgParam0 = 21583.2;
-  GE21ModNeuBkgParam1 = -476.59;
-  GE21ModNeuBkgParam2 = 4.24037;
-  GE21ModNeuBkgParam3 = -0.0185558;
-  GE21ModNeuBkgParam4 = 3.97809e-05;
-  GE21ModNeuBkgParam5 = -3.34575e-08;
+//const and slope for the expo model of neutral bkg for ME0 (GE1/1):
+  constNeuME0 = 807.;
+  slopeNeuME0 = -0.01443;
+//params for expo model of neutral bkg for ME0 (GE1/1):
+  constNeuME0_highRate = 1.02603e+04;
+  slopeNeuME0_highRate = -1.62806e-02;
 }
 
 ME0SimpleModel::~ME0SimpleModel()
@@ -204,43 +185,27 @@ void ME0SimpleModel::simulateNoise(const ME0EtaPartition* roll, CLHEP::HepRandom
   double averageNeutralNoiseRatePerRoll = 0.;
   double averageNoiseElectronRatePerRoll = 0.;
   double averageNoiseRatePerRoll = 0.;
-  if (me0Id.station() == 1)
+  if (me0Id.station() != 1)
   {
-//simulate neutral background for GE1/1
-    if (simulateLowNeutralRate_)
-      averageNeutralNoiseRatePerRoll = constNeuGE11 * TMath::Exp(slopeNeuGE11 * rollRadius);
-    else
-      averageNeutralNoiseRatePerRoll = constNeuGE11_highRate * TMath::Exp(slopeNeuGE11_highRate * rollRadius);
-//simulate electron background for GE1/1
-    if (simulateElectronBkg_)
-      averageNoiseElectronRatePerRoll = GE11ElecBkgParam0
-                                      + GE11ElecBkgParam1 * rollRadius
-                                      + GE11ElecBkgParam2 * rollRadius * rollRadius
-                                      + GE11ElecBkgParam3 * rollRadius * rollRadius * rollRadius;
-    averageNoiseRatePerRoll = averageNeutralNoiseRatePerRoll + averageNoiseElectronRatePerRoll;
+    throw cms::Exception("Geometry") << "ME0SimpleModel::simulateNoise() - this ME0 id is from station 1, which cannot happen: " <<roll->id() << "\n";
   }
-  if (me0Id.station() == 2)
-  {
-//simulate neutral background for GE2/1
+  else
+    {
+      //simulate neutral background for ME0 
     if (simulateLowNeutralRate_)
-      averageNeutralNoiseRatePerRoll = GE21NeuBkgParam0
-                                     + GE21NeuBkgParam1 * rollRadius
-                                     + GE21NeuBkgParam2 * rollRadius * rollRadius
-                                     + GE21NeuBkgParam3 * rollRadius * rollRadius * rollRadius
-                                     + GE21NeuBkgParam4 * rollRadius * rollRadius * rollRadius * rollRadius
-                                     + GE21NeuBkgParam5 * rollRadius * rollRadius * rollRadius * rollRadius * rollRadius;
+      averageNeutralNoiseRatePerRoll = constNeuME0 * TMath::Exp(slopeNeuME0 * rollRadius);
     else
-      averageNeutralNoiseRatePerRoll = GE21ModNeuBkgParam0
-                                     + GE21ModNeuBkgParam1 * rollRadius
-                                     + GE21ModNeuBkgParam2 * rollRadius * rollRadius
-                                     + GE21ModNeuBkgParam3 * rollRadius * rollRadius * rollRadius
-                                     + GE21ModNeuBkgParam4 * rollRadius * rollRadius * rollRadius * rollRadius
-                                     + GE21ModNeuBkgParam5 * rollRadius * rollRadius * rollRadius * rollRadius * rollRadius;
-//simulate electron background for GE2/1
+      averageNeutralNoiseRatePerRoll = constNeuME0_highRate * TMath::Exp(slopeNeuME0_highRate * rollRadius);
+//simulate electron background for ME0
     if (simulateElectronBkg_)
-      averageNoiseElectronRatePerRoll = constElecGE21 * TMath::Exp(slopeElecGE21 * rollRadius);
+      averageNoiseElectronRatePerRoll = ME0ElecBkgParam0
+                                      + ME0ElecBkgParam1 * rollRadius
+                                      + ME0ElecBkgParam2 * rollRadius * rollRadius
+                                      + ME0ElecBkgParam3 * rollRadius * rollRadius * rollRadius;
     averageNoiseRatePerRoll = averageNeutralNoiseRatePerRoll + averageNoiseElectronRatePerRoll;
-  }
+    }
+  
+
 //simulate intrinsic noise
   if(simulateIntrinsicNoise_)
   {

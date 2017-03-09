@@ -32,17 +32,20 @@ process.maxEvents = cms.untracked.PSet(
 #from SimMuon.GEMDigitizer.customizeGEMDigi import customize_digi_addGEM_muon_only
 #process = customize_digi_addGEM_muon_only(process) 
 
-process.load('SimMuon.GEMDigitizer.muonME0DigiTrivial_cfi')
-process.RandomNumberGeneratorService.simMuonME0TrivDigis = cms.PSet(
-    initialSeed = cms.untracked.uint32(123456798),
-    engineName = cms.untracked.string('HepJamesRandom')
-    )
+#process.load('SimMuon.GEMDigitizer.muonME0DigiTrivial_cfi')
+#process.RandomNumberGeneratorService.simMuonME0TrivDigis = cms.PSet(
+#    initialSeed = cms.untracked.uint32(123456798),
+#    engineName = cms.untracked.string('HepJamesRandom')
+#    )
 
 
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:step1.root'),
+    fileNames = cms.untracked.vstring(
+'/store/user/mileva/forME0/step_gen_simME0_5000evts.root'
+
+),
     inputCommands = cms.untracked.vstring('keep *', 
         'drop *_genParticles_*_*', 
         'drop *_genParticlesForJets_*_*', 
