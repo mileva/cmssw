@@ -21,14 +21,20 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(	
-    'file:/afs/cern.ch/work/m/mileva/milena/CMSSW_9_0_0_pre4/src/step2.root'
+    'file:/afs/cern.ch/work/m/mileva/tempGem/CMSSW_9_0_0_pre4/src/step2.root'
+#    '/store/user/mileva/forME0/step_gen_simME0_5000evts.root'
     )
 )
 
 process.dumper = cms.EDAnalyzer("ME0DigiReader",
     simhitToken = cms.InputTag("g4SimHits","MuonME0Hits"), 
     me0DigiToken = cms.InputTag("simMuonME0TrivDigis"), 
-    me0StripDigiSimLinkToken = cms.InputTag("simMuonME0TrivDigis","ME0") 
+    me0StripDigiSimLinkToken = cms.InputTag("simMuonME0TrivDigis","ME0"),
+    debugFlag = cms.bool(False)
+)
+
+process.TFileService = cms.Service("TFileService",
+    fileName = cms.string('testME0DigiReader.root')
 )
 
 process.p    = cms.Path(process.dumper)
