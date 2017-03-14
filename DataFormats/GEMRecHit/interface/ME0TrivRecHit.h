@@ -96,7 +96,7 @@ class ME0TrivRecHit : public RecHit2DLocalPos {
 
   /// Return the me0Id
   ME0DetId me0Id() const {
-    return theME0Id;
+    return theME0TrivId;
   }
  
   int BunchX() const {
@@ -115,7 +115,7 @@ class ME0TrivRecHit : public RecHit2DLocalPos {
   bool operator==(const ME0TrivRecHit& hit) const;
 
  private:
-  ME0DetId theME0Id;
+  ME0DetId theME0TrivId;
   int theBx;
   int theFirstStrip;
   int theClusterSize;

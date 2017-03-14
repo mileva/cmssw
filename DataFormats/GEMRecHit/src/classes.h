@@ -8,6 +8,10 @@
 #include "DataFormats/GEMRecHit/interface/GEMSegmentCollection.h"
 #include "DataFormats/GEMRecHit/interface/ME0Segment.h"
 #include "DataFormats/GEMRecHit/interface/ME0SegmentCollection.h"
+
+#include "DataFormats/GEMRecHit/interface/ME0TrivRecHit.h"
+#include "DataFormats/GEMRecHit/interface/ME0TrivRecHitCollection.h"
+
 #include "DataFormats/Common/interface/Wrapper.h"
 
 namespace DataFormats_GEMRecHit {
@@ -18,6 +22,12 @@ namespace DataFormats_GEMRecHit {
     std::map<GEMDetId, std::pair<unsigned long, unsigned long> > dummygemdetid2;
     std::map<ME0DetId, std::pair<unsigned int, unsigned int> > dummyme0detid1;
     std::map<ME0DetId, std::pair<unsigned long, unsigned long> > dummyme0detid2;
+
+//for ME0 realistic readout
+    std::pair<unsigned int, unsigned int> dummyme0t1;
+    std::pair<unsigned long, unsigned long> dummyme0t2;
+    std::map<GEMDetId, std::pair<unsigned int, unsigned int> > dummyme0tdetid1;
+    std::map<GEMDetId, std::pair<unsigned long, unsigned long> > dummyme0tdetid2;
 
     GEMRecHit rrh;
     std::vector<GEMRecHit> vrh;
@@ -43,6 +53,12 @@ namespace DataFormats_GEMRecHit {
     GEMSegmentCollection gemseg;
     edm::Wrapper<GEMSegmentCollection> gemdwc1;
     GEMCSCSegmentRef gemref;
+
+//for ME0 realistic readout
+    ME0TrivRecHit mtrh;
+    std::vector<ME0TrivRecHit> vmth;
+    ME0TrivRecHitCollection mtc;
+    edm::Wrapper<ME0TrivRecHitCollection> mtw;
   };
 }
 
