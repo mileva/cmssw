@@ -4,7 +4,7 @@
 #include <bitset>
 #include <vector>
 
-const int maskSIZE=768;			//as the maximum number of strips per eta partition
-typedef std::bitset<maskSIZE> EtaPartitionMask;
+const int maskSIZEME0=768;			//as the maximum number of strips per eta partition
+typedef std::bitset<maskSIZEME0> EtaPartitionMask;
 
 #endif
