@@ -26,8 +26,6 @@ ME0RecHit::ME0RecHit(const ME0DetId& me0Id, float tof, const LocalPoint& pos) : 
 {
 }
 
-
-
 // Constructor from a local position and error, wireId and digi time.
 ME0RecHit::ME0RecHit(const ME0DetId& me0Id,
 		     float tof, 
@@ -36,6 +34,44 @@ ME0RecHit::ME0RecHit(const ME0DetId& me0Id,
   theME0Id(me0Id), theTOF(tof), theLocalPosition(pos), theLocalError(err)
 {
 }
+
+//rumi: constructors for me0 real rechit
+ME0RecHit::ME0RecHit(const ME0DetId& me0Id, int bx) :  RecHit2DLocalPos(me0Id),
+  theME0Id(me0Id),  theLocalPosition(), theLocalError(), theBx(bx),theFirstStrip(999), theClusterSize(999), RealDigi(true) 
+{
+}
+
+ME0RecHit::ME0RecHit(const ME0DetId& me0Id, int bx, const LocalPoint& pos) :  RecHit2DLocalPos(me0Id),
+  theME0Id(me0Id), theLocalPosition(pos), theBx(bx), theFirstStrip(999), theClusterSize(999), RealDigi(true) 
+{
+  float stripResolution = 3.0 ; //cm  this sould be taken from trimmed cluster size times strip size 
+                                 //    taken out from geometry service i.e. topology	//rumi: the value to be changed with respect to the ME0  strip pitch
+  theLocalError =
+    LocalError(stripResolution*stripResolution, 0., 0.); //FIXME: is it really needed?
+}
+
+// Constructor from a local position and error, wireId and digi time.
+ME0RecHit::ME0RecHit(const ME0DetId& me0Id,
+		     int bx,
+		     const LocalPoint& pos,
+		     const LocalError& err) :  RecHit2DLocalPos(me0Id),
+  theME0Id(me0Id), theLocalPosition(pos), theLocalError(err), theBx(bx),theFirstStrip(99), theClusterSize(999), RealDigi(true) 
+{
+}
+
+// Constructor from a local position and error, wireId, bx and cluster size.
+ME0RecHit::ME0RecHit(const ME0DetId& me0Id,
+		     int bx,
+		     int firstStrip,
+		     int clustSize,
+		     const LocalPoint& pos,
+		     const LocalError& err) :  RecHit2DLocalPos(me0Id),
+  theME0Id(me0Id), theLocalPosition(pos), theLocalError(err), theBx(bx),theFirstStrip(firstStrip), theClusterSize(clustSize), RealDigi(true) 
+{
+}
+
+//rumi: end constructors for me0 real rechit
+
 
 // Destructor
 ME0RecHit::~ME0RecHit()

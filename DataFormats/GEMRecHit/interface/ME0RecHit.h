@@ -17,6 +17,7 @@
 class ME0RecHit : public RecHit2DLocalPos {
  public:
 
+
   ME0RecHit(const ME0DetId& me0Id,
 float tof);
 
@@ -38,27 +39,48 @@ float tof,
 const LocalPoint& pos,
 const LocalError& err);
   
+//////
+//rumi: add constructors for real rechit
+  ME0RecHit(const ME0DetId& me0Id,
+	    int bx);
+
+  ME0RecHit(const ME0DetId& me0Id,
+	    int bx,
+	    const LocalPoint& pos);
+  
+
+  /// Constructor from a local position and error, me0Id and bx.
+  ME0RecHit(const ME0DetId& me0Id,
+	    int bx,
+	    const LocalPoint& pos,
+	    const LocalError& err);
+  
+  /// Constructor from a local position and error, me0Id, bx, frist strip of cluster and cluster size.
+  ME0RecHit(const ME0DetId& me0Id,
+	    int bx,
+	    int firstStrip,
+	    int clustSize,
+	    const LocalPoint& pos,
+	    const LocalError& err);
+//rumi: end rechit from real me0 digis
+
 
   /// Destructor
   virtual ~ME0RecHit();
-
 
   /// Return the 3-dimensional local position
   virtual LocalPoint localPosition() const {
     return theLocalPosition;
   }
 
-
   /// Return the 3-dimensional error on the local position
   virtual LocalError localPositionError() const {
     return theLocalError;
   }
 
-
   virtual ME0RecHit* clone() const;
 
-  
-  /// Access to component RecHits.
+    /// Access to component RecHits.
   /// No components rechits: it returns a null vector
   virtual std::vector<const TrackingRecHit*> recHits() const;
 
@@ -96,6 +118,23 @@ const LocalError& err);
     return theTOF;
   }
 
+//rumi add members for real rechit
+  bool isRealDigi() {return RealDigi;}
+
+  int BunchX() const {
+    return theBx;
+  }
+
+  int firstClusterStrip() const {
+    return theFirstStrip;
+  }
+
+  int clusterSize() const {
+    return theClusterSize;
+  }
+//rumi: end members for real me0 rechit
+
+
   /// Comparison operator, based on the gemId and the digi time
   bool operator==(const ME0RecHit& hit) const;
 
@@ -105,6 +144,12 @@ const LocalError& err);
   // Position and error in the Local Ref. Frame of the ME0Layer
   LocalPoint theLocalPosition;
   LocalError theLocalError;
+
+//rumi: add boolean to separate the pseudo and real cluster and other members for real rechit
+  int theBx;
+  int theFirstStrip;
+  int theClusterSize;
+  bool RealDigi = false;
 
 };
 #endif
