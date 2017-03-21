@@ -56,6 +56,17 @@
   <class name="edm::Wrapper<edm::RangeMap<ME0DetId,edm::OwnVector<ME0Segment,edm::ClonePolicy<ME0Segment> >,edm::ClonePolicy<ME0Segment> > >" splitLevel="0"/>
   <class name="ME0SegmentRef" splitLevel="0"/>
 
+  <class name="ME0TrivRecHit" splitLevel="0" ClassVersion="11">
+   <version ClassVersion="11" checksum="3852915650"/>
+  <version ClassVersion="10" checksum="3146992425"/>
+  </class>
+  <class name="std::vector<ME0TrivRecHit>" splitLevel="0"/>
+  <class name="std::vector<ME0TrivRecHit*>" splitLevel="0"/>
+  <class name="edm::OwnVector<ME0TrivRecHit, edm::ClonePolicy<ME0TrivRecHit> >" splitLevel="0"/>
+  <class name="edm::RangeMap<ME0DetId, edm::OwnVector<ME0TrivRecHit, edm::ClonePolicy<ME0TrivRecHit> >, edm::ClonePolicy<ME0TrivRecHit> >" splitLevel="0"/>
+  <class name="edm::Wrapper<edm::RangeMap<ME0DetId, edm::OwnVector<ME0TrivRecHit, edm::ClonePolicy<ME0TrivRecHit> >, edm::ClonePolicy<ME0TrivRecHit> > >" splitLevel="0"/>
+
+
 </selection>
 <exclusion>
   <class name="edm::OwnVector<GEMRecHit, edm::ClonePolicy<GEMRecHit> >">
@@ -68,6 +79,9 @@
     <method name="sort" splitLevel="0"/>
   </class>
   <class name="edm::OwnVector<ME0Segment, edm::ClonePolicy<ME0Segment> >">
+    <method name="sort" splitLevel="0"/>
+  </class>
+  <class name="edm::OwnVector<ME0TrivRecHit, edm::ClonePolicy<ME0TrivRecHit> >">
     <method name="sort" splitLevel="0"/>
   </class>
 </exclusion>

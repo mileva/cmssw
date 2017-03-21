@@ -40,11 +40,17 @@ muonlocalreco = cms.Sequence(dtlocalreco+csclocalreco+rpcRecHits)
 from RecoLocalMuon.GEMRecHit.gemLocalReco_cff import *
 from RecoLocalMuon.GEMRecHit.me0LocalReco_cff import *
 
+#rumi: dummy way to run only me0 realistic rechits keeping me0 segment with input from the pseudodigis
+from RecoLocalMuon.GEMRecHit.me0TrivRecHits_cfi import *
+
 _run3_muonlocalreco = muonlocalreco.copy()
 _run3_muonlocalreco += gemLocalReco
 
 _phase2_muonlocalreco = _run3_muonlocalreco.copy()
 _phase2_muonlocalreco += me0LocalReco
+#rumi: dummy way to run only me0 realistic rechits keeping me0 segment with input from the pseudodigis
+_phase2_muonlocalreco += me0TrivRecHits
+
 
 from Configuration.Eras.Modifier_run3_GEM_cff import run3_GEM
 run3_GEM.toReplaceWith( muonlocalreco , _run3_muonlocalreco )

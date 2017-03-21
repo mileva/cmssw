@@ -69,6 +69,12 @@ ME0EtaPartition::localError(float strip) const
   return this->specificTopology().localError(strip, 1./sqrt(12.));
 }
 
+LocalError
+ME0EtaPartition::localError12(float strip, float cluster_size) const		//added for ME0 clusted based on the cluster of realistic ME0 digis 
+{
+ return this->specificTopology().localError(strip, cluster_size*cluster_size/12.);
+}
+
 float
 ME0EtaPartition::strip(const LocalPoint& lp) const
 { 
