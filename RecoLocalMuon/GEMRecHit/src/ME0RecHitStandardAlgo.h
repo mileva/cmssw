@@ -28,6 +28,18 @@ class ME0RecHitStandardAlgo : public ME0RecHitBaseAlgo {
                        LocalPoint& point,
                        LocalError& error) const;
 
+  // rumi
+  virtual bool computeReal(const ME0EtaPartition& roll,
+                           const ME0Cluster& cl,
+                           LocalPoint& Point,
+                           LocalError& error) const;
+
+  virtual bool computeReal(const ME0EtaPartition& roll,
+ 		            const ME0Cluster& cl,
+                            const float& angle,
+                            const GlobalPoint& globPos, 
+                            LocalPoint& Point,
+                            LocalError& error) const;
 
 };
 #endif

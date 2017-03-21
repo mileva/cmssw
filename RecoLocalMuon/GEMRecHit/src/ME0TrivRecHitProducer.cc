@@ -165,7 +165,7 @@ void ME0TrivRecHitProducer::produce(Event& event, const EventSetup& setup) {
 
   auto recHitCollection = std::make_unique<ME0TrivRecHitCollection>();
 
-  // Iterate through all digi collections ordered by LayerId   
+  // Iterate through all realisitc digi collections ordered by LayerId   
 
   ME0DigiCollection::DigiRangeIterator me0dgIt;
   for (me0dgIt = digis->begin(); me0dgIt != digis->end();
@@ -208,7 +208,7 @@ void ME0TrivRecHitProducer::produce(Event& event, const EventSetup& setup) {
     
     if(recHits.size() > 0) //FIXME: is it really needed?
       recHitCollection->put(me0Id, recHits.begin(), recHits.end());
-  }
+  }//end realistic digis input
 
   event.put(std::move(recHitCollection));
 

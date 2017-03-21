@@ -18,7 +18,17 @@
 #include "DataFormats/GEMRecHit/interface/ME0RecHit.h"
 #include "DataFormats/Common/interface/OwnVector.h"
 
+//rumi:
+#include "DataFormats/GEMDigi/interface/ME0DigiCollection.h"
+#include "RecoLocalMuon/GEMRecHit/src/ME0EtaPartitionMask.h"
+#include "RecoLocalMuon/GEMRecHit/src/ME0MaskReClusterizer.h"
+//rumi end
+
 class ME0DetId;
+//rumi
+class ME0Cluster;
+class ME0EtaPartition;
+//rumi end
 
 namespace edm {
   class ParameterSet;
@@ -47,6 +57,34 @@ class ME0RecHitBaseAlgo {
   virtual bool compute(const ME0DigiPreReco& digi,
                              LocalPoint& Point,
                              LocalError& error) const = 0;
+
+//rumi
+
+   /// Build all hits in the range associated to the me0Id, at the 1st step.
+   virtual edm::OwnVector<ME0RecHit> reconstructReal(const ME0EtaPartition& roll,
+ 						const ME0DetId& me0Id,
+ 						const ME0DigiCollection::Range& digiRange,
+                                                 const EtaPartitionMask& mask);
+
+  /// standard local recHit computation
+   virtual bool computeReal(const ME0EtaPartition& roll,
+                        const ME0Cluster& cl,
+                        LocalPoint& Point,
+                        LocalError& error) const = 0;
+ 
+ 
+
+ 
+   /// local recHit computation accounting for track direction and 
+   /// absolute position
+   virtual bool computeReal(const ME0EtaPartition& roll,
+ 		       const ME0Cluster& cl,
+                        const float& angle,
+                        const GlobalPoint& globPos, 
+                        LocalPoint& Point,
+                        LocalError& error) const = 0;
+//rumi:
+
 };
 #endif
 

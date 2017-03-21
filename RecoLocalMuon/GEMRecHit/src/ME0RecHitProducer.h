@@ -39,6 +39,22 @@
 
 #include <string>
 
+//rumi
+#include "DataFormats/GEMDigi/interface/ME0DigiCollection.h"
+// #include "CondFormats/GEMObjects/interface/ME0MaskedStrips.h"
+// #include "CondFormats/DataRecord/interface/ME0MaskedStripsRcd.h"
+// #include "CondFormats/GEMObjects/interface/ME0DeadStrips.h"
+// #include "CondFormats/DataRecord/interface/ME0DeadStripsRcd.h"
+#include "ME0EtaPartitionMask.h"
+
+
+namespace edm {
+  class ParameterSet;
+  class Event;
+  class EventSetup;
+}
+//rumi end
+
 class ME0RecHitBaseAlgo;
 
 class ME0RecHitProducer : public edm::stream::EDProducer<> {
@@ -59,12 +75,30 @@ public:
 private:
 
   // The label to be used to retrieve ME0 digis from the event
-
   edm::EDGetTokenT<ME0DigiPreRecoCollection> m_token;
+
+//rumi
+  // The token to be used to retrieve ME0 realistic digis from the event
+  edm::EDGetTokenT<ME0DigiCollection> theME0TrivDigiToken;
+//rumi end
 
   // The reconstruction algorithm
   ME0RecHitBaseAlgo *theAlgo;
+
+//rumi
   //   static std::string theAlgoName;
+  // ME0MaskedStrips* ME0MaskedStripsObj;
+  // Object with mask-strips-vector for all the ME0 Detectors
+
+  // ME0DeadStrips* ME0DeadStripsObj;
+  // Object with dead-strips-vector for all the ME0 Detectors
+
+  // std::string maskSource;
+  // std::string deadSource;
+
+  // std::vector<ME0MaskedStrips::MaskItem> MaskVec;
+  // std::vector<ME0DeadStrips::DeadItem> DeadVec;
+
 };
 
 #endif
