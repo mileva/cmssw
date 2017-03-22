@@ -4,4 +4,5 @@ me0RecHits = cms.EDProducer("ME0RecHitProducer",
     recAlgoConfig = cms.PSet(),
     recAlgo = cms.string('ME0RecHitStandardAlgo'),
     me0DigiLabel = cms.InputTag("simMuonME0ReDigis"),
+    me0DigiRealLabel = cms.InputTag("simMuonME0TrivDigis")
 )

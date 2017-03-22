@@ -3,6 +3,8 @@
  *  $Date: 2013/04/24 17:16:35 $
  *  $Revision: 1.1 $
  *  \author M. Maggi -- INFN Bari
+ *  \modified R. Hadjiiska -- INRNE Sofia
+ *  \merged ME0RecHit from pseudodigi and realistic digi input, the rechits to be distinguish by asking .isRealDigi()..
 */
 
 #include "ME0RecHitProducer.h"
@@ -18,9 +20,9 @@
 #include "DataFormats/MuonDetId/interface/ME0DetId.h"
 #include "DataFormats/GEMRecHit/interface/ME0TrivRecHit.h"
 
-#include "RecoLocalMuon/GEMRecHit/interface/ME0TrivRecHitBaseAlgo.h"
-#include "RecoLocalMuon/GEMRecHit/interface/ME0TrivRecHitAlgoFactory.h"
-#include "DataFormats/GEMRecHit/interface/ME0TrivRecHitCollection.h"
+//#include "RecoLocalMuon/GEMRecHit/interface/ME0TrivRecHitBaseAlgo.h"	//FIXME
+//#include "RecoLocalMuon/GEMRecHit/interface/ME0TrivRecHitAlgoFactory.h"	//FIXME
+//#include "DataFormats/GEMRecHit/interface/ME0TrivRecHitCollection.h"	//FIXME
 
 // #include "CondFormats/GEMObjects/interface/ME0MaskedStrips.h"
 // #include "CondFormats/DataRecord/interface/ME0MaskedStripsRcd.h"
@@ -30,21 +32,19 @@
 using namespace edm;
 using namespace std;
 
-
 ME0RecHitProducer::ME0RecHitProducer(const edm::ParameterSet& config){
 
   produces<ME0RecHitCollection>();
  
   m_token = consumes<ME0DigiPreRecoCollection>( config.getParameter<edm::InputTag>("me0DigiLabel") ); 
+  theME0TrivDigiToken = consumes<ME0DigiCollection>( config.getParameter<edm::InputTag>("me0DigiRealLabel") ); 
 
- 
   // Get the concrete reconstruction algo from the factory
 
   std::string theAlgoName = config.getParameter<std::string>("recAlgo");
-  theAlgo = ME0RecHitAlgoFactory::get()->create(theAlgoName,
-						config.getParameter<edm::ParameterSet>("recAlgoConfig"));
-  // Get masked- and dead-strip information
+  theAlgo = ME0RecHitAlgoFactory::get()->create(theAlgoName, config.getParameter<edm::ParameterSet>("recAlgoConfig"));
 
+  // Get masked- and dead-strip information
   /* ME0MaskedStripsObj = new ME0MaskedStrips();
 
   ME0DeadStripsObj = new ME0DeadStrips();
@@ -85,7 +85,6 @@ ME0RecHitProducer::ME0RecHitProducer(const edm::ParameterSet& config){
   */
 }
 
-
 ME0RecHitProducer::~ME0RecHitProducer(){
   delete theAlgo;
   // delete ME0MaskedStripsObj;
@@ -93,9 +92,8 @@ ME0RecHitProducer::~ME0RecHitProducer(){
 
 }
 
-
-
 void ME0RecHitProducer::beginRun(const edm::Run& r, const edm::EventSetup& setup){
+
   // Getting the masked-strip information
   /*
   if ( maskSource == "EventSetup" ) {
@@ -136,8 +134,6 @@ void ME0RecHitProducer::beginRun(const edm::Run& r, const edm::EventSetup& setup
   */
 }
 
-
-
 void ME0RecHitProducer::produce(edm::Event& event, const edm::EventSetup& setup) {
 
   // Get the ME0 Geometry
@@ -158,35 +154,50 @@ void ME0RecHitProducer::produce(edm::Event& event, const edm::EventSetup& setup)
 
   // Create the pointer to the collection which will store the rechits
 
+  std::map<ME0DetId, std::vector<ME0RecHit> > mapAll;	//rumi:
+
   auto recHitCollection = std::make_unique<ME0RecHitCollection>();
 
   // Iterate through all digi collections ordered by LayerId   
 
   ME0DigiPreRecoCollection::DigiRangeIterator me0dgIt;
-  for (me0dgIt = digis->begin(); me0dgIt != digis->end();
-       ++me0dgIt){
+  for (me0dgIt = digis->begin(); me0dgIt != digis->end(); ++me0dgIt){
        
     // The layerId
     const ME0DetId& me0Id = (*me0dgIt).first;
-
 
     // Get the iterators over the digis associated with this LayerId
     const ME0DigiPreRecoCollection::Range& range = (*me0dgIt).second;
 
     // Call the reconstruction algorithm    
 
-    edm::OwnVector<ME0RecHit> recHits =
-      theAlgo->reconstruct(me0Id, range);
-    
+    edm::OwnVector<ME0RecHit> recHits = theAlgo->reconstruct(me0Id, range);
+
+   //rumi: push all the rechits in the mapAll
     if(recHits.size() > 0)
-      recHitCollection->put(me0Id, recHits.begin(), recHits.end());
+    {
+      for(OwnVector<ME0RecHit>::const_iterator hit=recHits.begin();hit!=recHits.end();++hit){
+        mapAll[me0Id].push_back(*hit);
+      }
+    }
+
+/*  
+//rumi:
+std::cout << "Inside Prereco\t size is " <<  recHits.size() << std::endl;
+std::cout << "in roll: " << me0Id.rawId() << std::endl;
+for (unsigned int i=0; i < recHits.size(); i++)
+{
+std::cout << "isReal " << recHits[i].isRealDigi() << std::endl;
+std::cout << "position: " << recHits[i].localPosition() << std::endl;
+}
+*/
+
+//      recHitCollection->put(me0Id, recHits.begin(), recHits.end());
   }//rumi: end prereco input
 
-//rumi
-  // Iterate through all realisitc digi collections ordered by LayerId   
+  //rumi: Iterate through all realisitc digi collections ordered by LayerId   
   ME0DigiCollection::DigiRangeIterator me0dgItR;
-  for (me0dgItR = digisReal->begin(); me0dgItR != digisReal->end();
-       ++me0dgItR){
+  for (me0dgItR = digisReal->begin(); me0dgItR != digisReal->end(); ++me0dgItR){
        
     // The layerId
     const ME0DetId& me0Id = (*me0dgItR).first;
@@ -199,6 +210,8 @@ void ME0RecHitProducer::produce(edm::Event& event, const edm::EventSetup& setup)
 
     // Getting the roll mask, that includes dead strips, for the given ME0Det
     EtaPartitionMask mask;
+
+//for future when some strips will be eventualy masked
     /*
     int rawId = me0Id.rawId();
     int Size = ME0MaskedStripsObj->MaskVec.size();
@@ -219,14 +232,33 @@ void ME0RecHitProducer::produce(edm::Event& event, const edm::EventSetup& setup)
     */
 
     // Call the reconstruction algorithm    
-    OwnVector<ME0RecHit> recHits =
-      theAlgo->reconstructReal(*roll, me0Id, range, mask);
-    
+    OwnVector<ME0RecHit> recHits = theAlgo->reconstructReal(*roll, me0Id, range, mask);
+
+/*
+//rumi:
+std::cout << "Inside theReal\t size is " <<  recHits.size() << std::endl;
+std::cout << "in roll: " << me0Id.rawId() <<  std::endl;
+ for (unsigned int i=0; i < recHits.size(); i++)
+{
+std::cout << "isReal " << recHits[i].isRealDigi() << std::endl;
+std::cout << "position: " << recHits[i].localPosition() << std::endl;
+}
+*/ 
+
+    //rumi: push all the rechits in the mapAll
     if(recHits.size() > 0) //FIXME: is it really needed?
-      recHitCollection->put(me0Id, recHits.begin(), recHits.end());
+    { 
+      for(OwnVector<ME0RecHit>::const_iterator hit=recHits.begin();hit!=recHits.end();++hit){
+        mapAll[me0Id].push_back(*hit);
+      }
+    }  
+//      recHitCollection->put(me0Id, recHits.begin(), recHits.end());
   }//end realistic digis input
 
+  for (std::map<ME0DetId, std::vector<ME0RecHit> >::iterator kit=mapAll.begin(); kit!=mapAll.end(); ++kit)
+  {
+    recHitCollection->put(kit->first, kit->second.begin(), kit->second.end());
+  }
   event.put(std::move(recHitCollection));
-
 }
 

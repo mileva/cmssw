@@ -29,7 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:step2test.root'),
+    fileNames = cms.untracked.vstring('file:/afs/cern.ch/work/m/mileva/CMSSW_9_0_0_pre4/src/step2test.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 

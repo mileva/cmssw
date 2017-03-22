@@ -59,6 +59,9 @@ void ME0SegmentBuilder::build(const ME0RecHitCollection* recHits, ME0SegmentColl
     // all detIds have been assigned to the to chamber
     const ME0Chamber* chamber = geom_->chamber(enIt->first);    
     for(auto rechit = enIt->second.begin(); rechit != enIt->second.end(); ++rechit) {
+//rumi: skip the rechit from realistic input still the pseudodigi input is the base one in use
+      if((*rechit)->isRealDigi() == true) continue;
+//      std::cout << "is realstic rechit = " << (*rechit)->isRealDigi() << std::endl;
       me0RecHits.push_back(*rechit);
       ens[(*rechit)->me0Id()]=geom_->etaPartition((*rechit)->me0Id());
     }    
