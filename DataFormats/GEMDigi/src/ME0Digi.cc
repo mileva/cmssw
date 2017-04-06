@@ -33,3 +33,10 @@ std::ostream & operator<<(std::ostream & o, const ME0Digi& digi)
 {
   return o << " strip: " << digi.strip() << " bx: " << digi.bx();
 }
+
+/*
+void ME0Digi::print() const
+{
+  std::cout << "Strip " << strip() << " bx " << bx() <<std::endl;
+}
+*/

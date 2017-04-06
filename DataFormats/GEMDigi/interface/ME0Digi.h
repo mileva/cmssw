@@ -1,14 +1,6 @@
 #ifndef DataFormats_GEMDigi_ME0Digi_h
 #define DataFormats_GEMDigi_ME0Digi_h
 
-/** \class ME0Digi
- *
- * Digi for ME0
- *  
- * \author Sven Dildick (TAMU)
- *
- */
-
 #include <boost/cstdint.hpp>
 #include <iosfwd>
 
@@ -25,6 +17,8 @@ public:
   // return the strip number. counts from 1.
   int strip() const { return strip_; }
   int bx() const {return bx_; }
+
+//  void print() const;
 
 private:
   uint16_t strip_;

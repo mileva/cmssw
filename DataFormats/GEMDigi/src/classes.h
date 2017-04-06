@@ -24,6 +24,7 @@
 
 #include <DataFormats/Common/interface/Wrapper.h>
 #include <vector>
+#include <map>
 
 namespace DataFormats_GEMDigi {
   struct dictionary {
@@ -66,6 +67,7 @@ namespace DataFormats_GEMDigi {
     std::vector<std::vector<ME0Digi> >  vvmm;
     ME0DigiCollection mmcol;
     edm::Wrapper<ME0DigiCollection> wmm;
+    edm::Wrapper<std::map< std::pair<int,int>, int > > a2;
 
     ME0PadDigi mp;
     std::vector<ME0PadDigi>  vmp;

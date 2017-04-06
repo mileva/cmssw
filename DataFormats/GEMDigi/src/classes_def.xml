@@ -48,6 +48,7 @@
 
 <class name="ME0Digi" ClassVersion="10">
  <version ClassVersion="10" checksum="2570759453"/>
+ <version ClassVersion="11" checksum="2570759453"/>
 </class>
 <class name="std::vector<ME0Digi>"/>
 <class name="std::map<ME0DetId,std::vector<ME0Digi> >"/>
@@ -69,5 +70,4 @@
 <class name="std::map<ME0DetId,std::vector<ME0TriggerDigi> >"/>
 <class name="MuonDigiCollection<ME0DetId,ME0TriggerDigi>"/> 
 <class name="edm::Wrapper<MuonDigiCollection<ME0DetId,ME0TriggerDigi> >" splitLevel="0"/> 
-
 </lcgdict>
