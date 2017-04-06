@@ -58,6 +58,9 @@ namespace DataFormats_GEMDigi {
     ME0DigiPreRecoCollection mcol;
     edm::Wrapper<ME0DigiPreRecoCollection> wm;
 
+    ME0DigiPreRecoMap mmap;
+    edm::Wrapper<ME0DigiPreRecoMap> wmmap;
+    
     ME0Digi mm;
     std::vector<ME0Digi>  vmm;
     std::vector<std::vector<ME0Digi> >  vvmm;
@@ -75,8 +78,5 @@ namespace DataFormats_GEMDigi {
     std::vector<std::vector<ME0LCTDigi> >  vvml;
     ME0LCTDigiCollection mlcol;
     edm::Wrapper<ME0LCTDigiCollection> wml;
-
-    ME0DigiPreRecoMap mmap;
-    edm::Wrapper<ME0DigiPreRecoMap> wmmap;
   };
 }
