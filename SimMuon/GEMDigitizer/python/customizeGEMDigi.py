@@ -323,15 +323,6 @@ def customize_random_ME0Digi(process):
     )
     return process
 
-# Add simMuonME0TrivDigis to the list of modules served by RandomNumberGeneratorService
-def customize_random_ME0DigiTriv(process):
-    process.RandomNumberGeneratorService.simMuonME0TrivDigis = cms.PSet(
-        initialSeed = cms.untracked.uint32(1234567),
-        engineName = cms.untracked.string('HepJamesRandom')
-    )
-    return process
-
-
 ## load the digitizer and pad producer
 def load_GEM_digitizers(process):
     process.load('SimMuon.GEMDigitizer.muonGEMDigi_cff')
@@ -342,12 +333,6 @@ def load_GEM_digitizers(process):
 def load_ME0_digitizers(process):
     process.load('SimMuon.GEMDigitizer.muonME0DigisPreReco_cfi')
     return process
-
-## load the ME0 realistic digitizer and producer
-def load_ME0Triv_digitizers(process):
-    process.load('SimMuon.GEMDigitizer.muonME0DigiTrivial_cfi')
-    return process
-
 
 # customize the full digitization sequence pdigi by adding GEMs
 def customize_digi_addGEM(process):
@@ -387,10 +372,8 @@ def customize_digi_addGEM_gem_only(process):
 def customize_digi_addGEM_addME0(process):
     process = load_GEM_digitizers(process)
     process = load_ME0_digitizers(process)
-    process = load_ME0Triv_digitizers(process)
     process = customize_random_GEMDigi(process)
     process = customize_random_ME0Digi(process)
-    process = customize_random_ME0DigiTriv(process)
     process = customize_mix_addGEM(process)
     process = customize_mix_addME0(process)
     process.muonDigi = cms.Sequence(
@@ -399,8 +382,7 @@ def customize_digi_addGEM_addME0(process):
         process.simMuonRPCDigis +
         process.simMuonGEMDigis +
         process.simMuonGEMPadDigis +
-        process.simMuonME0Digis+
-        process.simMuonME0TrivDigis
+        process.simMuonME0Digis
 
     )
     process.doAllDigi = cms.Sequence(
@@ -421,10 +403,8 @@ def customize_digi_addGEM_addME0(process):
 def customize_digi_addGEM_addME0_muon_only(process):
     process = load_GEM_digitizers(process)
     process = load_ME0_digitizers(process)
-    process = load_ME0Triv_digitizers(process)
     process = customize_random_GEMDigi(process)
     process = customize_random_ME0Digi(process)
-    process = customize_random_ME0DigiTriv(process)
     process = customize_mix_addGEM_addME0_muon_only(process)
     process.muonDigi = cms.Sequence(
         process.simMuonCSCDigis +
@@ -432,8 +412,7 @@ def customize_digi_addGEM_addME0_muon_only(process):
         process.simMuonRPCDigis +
         process.simMuonGEMDigis +
         process.simMuonGEMPadDigis +
-        process.simMuonME0Digis+
-        process.simMuonME0TrivDigis
+        process.simMuonME0Digis
     )
     process.pdigi = cms.Sequence(
         cms.SequencePlaceholder("randomEngineStateProducer")*
@@ -448,18 +427,15 @@ def customize_digi_addGEM_addME0_muon_only(process):
 def customize_digi_addGEM_addME0_gem_only(process):
     process = load_GEM_digitizers(process)
     process = load_ME0_digitizers(process)
-    process = load_ME0Triv_digitizers(process)
     process = customize_random_GEMDigi(process)
     process = customize_random_ME0Digi(process)
-    process = customize_random_ME0DigiTriv(process)
     process = customize_mix_addGEM_addME0_muon_only(process)
     process.pdigi = cms.Sequence(
         cms.SequencePlaceholder("randomEngineStateProducer")*
         cms.SequencePlaceholder("mix")*
         process.simMuonGEMDigis*
         process.simMuonGEMPadDigis*
-        process.simMuonME0Digis*
-        process.simMuonME0TrivDigis
+        process.simMuonME0Digis
     )
     process = append_GEMDigi_event(process)
     return process

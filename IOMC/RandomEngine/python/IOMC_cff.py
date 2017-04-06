@@ -182,9 +182,6 @@ phase2_muon.toModify(
         engineName = cms.untracked.string('HepJamesRandom')),
     simMuonME0ReDigis = cms.PSet(
         initialSeed = cms.untracked.uint32(7654321),
-        engineName = cms.untracked.string('HepJamesRandom')),
-    simMuonME0TrivDigis = cms.PSet(
-        initialSeed = cms.untracked.uint32(1234567),
         engineName = cms.untracked.string('HepJamesRandom'))
 )
 
