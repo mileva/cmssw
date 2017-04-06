@@ -75,5 +75,8 @@ namespace DataFormats_GEMDigi {
     std::vector<std::vector<ME0LCTDigi> >  vvml;
     ME0LCTDigiCollection mlcol;
     edm::Wrapper<ME0LCTDigiCollection> wml;
+
+    ME0DigiPreRecoMap mmap;
+    edm::Wrapper<ME0DigiPreRecoMap> wmmap;
   };
 }
