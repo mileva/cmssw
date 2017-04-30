@@ -1,7 +1,7 @@
-#include "SimMuon/GEMDigitizer/interface/GEMSimpleModel.h"
-#include "Geometry/GEMGeometry/interface/GEMEtaPartitionSpecs.h"
+#include "SimMuon/GEMDigitizer/interface/ME0SimpleModel.h"
+#include "Geometry/GEMGeometry/interface/ME0EtaPartitionSpecs.h"
 #include "Geometry/CommonTopologies/interface/TrapezoidalStripTopology.h"
-#include "Geometry/GEMGeometry/interface/GEMGeometry.h"
+#include "Geometry/GEMGeometry/interface/ME0Geometry.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandPoissonQ.h"
@@ -17,8 +17,8 @@ namespace
   const double COSMIC_PAR(37.62);
 }
 
-GEMSimpleModel::GEMSimpleModel(const edm::ParameterSet& config) :
-GEMDigiModel(config)
+ME0SimpleModel::ME0SimpleModel(const edm::ParameterSet& config) :
+ME0DigiModel(config)
 , averageEfficiency_(config.getParameter<double> ("averageEfficiency"))
 , averageShapingTime_(config.getParameter<double> ("averageShapingTime"))
 , timeResolution_(config.getParameter<double> ("timeResolution"))
@@ -34,60 +34,41 @@ GEMDigiModel(config)
 , doNoiseCLS_(config.getParameter<bool> ("doNoiseCLS"))
 , fixedRollRadius_(config.getParameter<bool> ("fixedRollRadius"))
 , simulateElectronBkg_(config.getParameter<bool> ("simulateElectronBkg"))
-, simulateLowNeutralRate_(config.getParameter<bool>("simulateLowNeutralRate"))
-, instLumi_(config.getParameter<double>("instLumi"))
-, rateFact_(config.getParameter<double>("rateFact"))
+//, simulateLowNeutralRate_(config.getParameter<bool>("simulateLowNeutralRate"))	//nofurther use of this parameter
+, instLumi_(config.getParameter<double> ("instLumi"))
+, rateFact_(config.getParameter<double> ("rateFact"))
 {
-  //initialise parameters from the fit:
-  //params for pol3 model of electron bkg for GE1/1:
-  GE11ElecBkgParam0 = 406.249;
-  GE11ElecBkgParam1 = -2.90939;
-  GE11ElecBkgParam2 = 0.00548191;
-  //params for pol3 model of electron bkg for GE2/1:
-  GE21ElecBkgParam0 = 97.0505;
-  GE21ElecBkgParam1 = -0.452612;
-  GE21ElecBkgParam2 = 0.00548191;
-  
-  //Neutral Bkg//obsolete, remove it but check for the dependencies in the configuration and customisation files
-  //Low Rate model L=10^{34}cm^{-2}s^{-1}
-  //const and slope for the expo model of neutral bkg for GE1/1://obsolete, remove it but check for the dependencies in the configuration and customisation files
-  constNeuGE11 = 807.;
-  slopeNeuGE11 = -0.01443;
-  //params for the simple pol5 model of neutral bkg for GE2/1://obsolete, remove it but check for the dependencies in the configuration and customisation files
-  GE21NeuBkgParam0 = 2954.04;
-  GE21NeuBkgParam1 = -58.7558;
-  GE21NeuBkgParam2 = 0.473481;
-  GE21NeuBkgParam3 = -0.00188292;
-  GE21NeuBkgParam4 = 3.67041e-06;
-  GE21NeuBkgParam5 = -2.80261e-09;
-  
-  //High Rate model L=5x10^{34}cm^{-2}s^{-1}
-  //params for pol3 model of neutral bkg for GE1/1:
-  GE11ModNeuBkgParam0 = 5710.23;
-  GE11ModNeuBkgParam1 = -43.3928;
-  GE11ModNeuBkgParam2 = 0.0863681;
-  //params for pol3 model of neutral bkg for GE2/1:
-  GE21ModNeuBkgParam0 = 1440.44;
-  GE21ModNeuBkgParam1 = -7.48607;
-  GE21ModNeuBkgParam2 = 0.0103078;
+//initialise parameters from the fit:
+//params for charged background model for ME0 at L=5x10^{34}cm^{-2}s^{-1}
+  ME0ElecBkgParam0 = 0.00171409;
+  ME0ElecBkgParam1 = 4900.56;
+  ME0ElecBkgParam2 = 710909;
+  ME0ElecBkgParam3 = -4327.25;
+
+//params for neutral background model for ME0 at L=5x10^{34}cm^{-2}s^{-1}
+  ME0NeuBkgParam0 = 0.00386257;
+  ME0NeuBkgParam1 = 6344.65;
+  ME0NeuBkgParam2 = 16627700;
+  ME0NeuBkgParam3 = -102098;
 }
 
-GEMSimpleModel::~GEMSimpleModel()
+ME0SimpleModel::~ME0SimpleModel()
 {
 }
 
-void GEMSimpleModel::setup()
+void ME0SimpleModel::setup()
 {
   return;
 }
 
-void GEMSimpleModel::simulateSignal(const GEMEtaPartition* roll, const edm::PSimHitContainer& simHits, CLHEP::HepRandomEngine* engine)
+void ME0SimpleModel::simulateSignal(const ME0EtaPartition* roll, const edm::PSimHitContainer& simHits, CLHEP::HepRandomEngine* engine)
 {
   stripDigiSimLinks_.clear();
   detectorHitMap_.clear();
   stripDigiSimLinks_ = StripDigiSimLinks(roll->id().rawId());
-  theGemDigiSimLinks_.clear();
-  theGemDigiSimLinks_ = GEMDigiSimLinks(roll->id().rawId());
+
+  theME0DigiSimLinks_.clear();
+  theME0DigiSimLinks_ = ME0DigiSimLinks(roll->id().rawId());
   bool digiMuon = false;
   bool digiElec = false;
   for (edm::PSimHitContainer::const_iterator hit = simHits.begin(); hit != simHits.end(); ++hit)
@@ -100,7 +81,7 @@ void GEMSimpleModel::simulateSignal(const GEMEtaPartition* roll, const edm::PSim
     double checkElecEff = CLHEP::RandFlat::shoot(engine, 0., 1.);
     if (std::abs(hit->particleType()) == 13 && checkMuonEff < averageEfficiency_)
       digiMuon = true;
-    if (std::abs(hit->particleType()) != 13) //consider all non muon particles with gem efficiency to electrons
+    if (std::abs(hit->particleType()) != 13) //consider all non muon particles with me0 efficiency to electrons
     {
       if (partMom <= 1.95e-03)
         elecEff = 1.7e-05 * TMath::Exp(2.1 * partMom * 1000.);
@@ -124,23 +105,23 @@ void GEMSimpleModel::simulateSignal(const GEMEtaPartition* roll, const edm::PSim
   }
 }
 
-int GEMSimpleModel::getSimHitBx(const PSimHit* simhit, CLHEP::HepRandomEngine* engine)
+int ME0SimpleModel::getSimHitBx(const PSimHit* simhit, CLHEP::HepRandomEngine* engine)
 {
   int bx = -999;
   const LocalPoint simHitPos(simhit->localPosition());
   const float tof(simhit->timeOfFlight());
   // random Gaussian time correction due to electronics jitter
   float randomJitterTime = CLHEP::RandGaussQ::shoot(engine, 0., timeJitter_);
-  const GEMDetId id(simhit->detUnitId());
-  const GEMEtaPartition* roll(geometry_->etaPartition(id));
+  const ME0DetId id(simhit->detUnitId());
+  const ME0EtaPartition* roll(geometry_->etaPartition(id));
   if (!roll)
   {
-    throw cms::Exception("Geometry")<< "GEMSimpleModel::getSimHitBx() - GEM simhit id does not match any GEM roll id: " << id << "\n";
+    throw cms::Exception("Geometry")<< "ME0SimpleModel::getSimHitBx() - ME0 simhit id does not match any ME0 roll id: " << id << "\n";
     return 999;
   }
   if (roll->id().region() == 0)
   {
-    throw cms::Exception("Geometry") << "GEMSimpleModel::getSimHitBx() - this GEM id is from barrel, which cannot happen: " << roll->id() << "\n";
+    throw cms::Exception("Geometry") << "ME0SimpleModel::getSimHitBx() - this ME0 id is from barrel, which cannot happen: " << roll->id() << "\n";
   }
   const double cspeed = 299792458;   // signal propagation speed in vacuum in [m/s]
   const int nstrips = roll->nstrips();
@@ -179,19 +160,19 @@ int GEMSimpleModel::getSimHitBx(const PSimHit* simhit, CLHEP::HepRandomEngine* e
   return bx;
 }
 
-void GEMSimpleModel::simulateNoise(const GEMEtaPartition* roll, CLHEP::HepRandomEngine* engine)
-//void GEMSimpleModel::simulateNoise(const GEMEtaPartition* roll)
+void ME0SimpleModel::simulateNoise(const ME0EtaPartition* roll, CLHEP::HepRandomEngine* engine)
 {
   if (!doBkgNoise_)
     return;
-  const GEMDetId gemId(roll->id());
+  const ME0DetId me0Id(roll->id());
   const int nstrips(roll->nstrips());
   double trArea(0.0);
   double trStripArea(0.0);
-  if (gemId.region() == 0)
+
+  if (me0Id.region() == 0)
   {
     throw cms::Exception("Geometry")
-        << "GEMSynchronizer::simulateNoise() - this GEM id is from barrel, which cannot happen.";
+        << "ME0Synchronizer::simulateNoise() - this ME0 id is from barrel, which cannot happen.";
   }
   const TrapezoidalStripTopology* top_(dynamic_cast<const TrapezoidalStripTopology*>(&(roll->topology())));
   const float striplength(top_->stripLength());
@@ -201,51 +182,28 @@ void GEMSimpleModel::simulateNoise(const GEMEtaPartition* roll, CLHEP::HepRandom
   const float rollRadius(fixedRollRadius_ ? top_->radius() : 
        top_->radius() + CLHEP::RandFlat::shoot(engine, -1.*top_->stripLength()/2., top_->stripLength()/2.));
 
+  const float rSqrtR = rollRadius * sqrt(rollRadius);
+
 //calculate noise from model
   double averageNeutralNoiseRatePerRoll = 0.;
   double averageNoiseElectronRatePerRoll = 0.;
   double averageNoiseRatePerRoll = 0.;
-  if (gemId.station() == 1)
+  if (me0Id.station() != 1)
   {
-//simulate neutral background for GE1/1
-    if (simulateLowNeutralRate_)
-      averageNeutralNoiseRatePerRoll = constNeuGE11 * TMath::Exp(slopeNeuGE11 * rollRadius);
-    else
-      averageNeutralNoiseRatePerRoll = (GE11ModNeuBkgParam0
-					+ GE11ModNeuBkgParam1 * rollRadius
-					+ GE11ModNeuBkgParam2 * rollRadius * rollRadius);    //simulate electron background for GE1/1
-    if (simulateElectronBkg_)
-      averageNoiseElectronRatePerRoll = (GE11ElecBkgParam0
-					 + GE11ElecBkgParam1 * rollRadius
-					 + GE11ElecBkgParam2 * rollRadius * rollRadius);
-      
-    // Scale up/down for desired instantaneous lumi (reference is 5E34, double from config is in units of 1E34)
-    averageNoiseRatePerRoll = averageNeutralNoiseRatePerRoll + averageNoiseElectronRatePerRoll;
-    averageNoiseRatePerRoll *= instLumi_*rateFact_*1.0/referenceInstLumi;
+    throw cms::Exception("Geometry") << "ME0SimpleModel::simulateNoise() - this ME0 id is from station 1, which cannot happen: " <<roll->id() << "\n";
   }
-  if (gemId.station() == 2)
+  else
   {
-    //simulate neutral background for GE2/1
-    if (simulateLowNeutralRate_)
-      averageNeutralNoiseRatePerRoll = GE21NeuBkgParam0
-                                     + GE21NeuBkgParam1 * rollRadius
-                                     + GE21NeuBkgParam2 * rollRadius * rollRadius
-                                     + GE21NeuBkgParam3 * rollRadius * rollRadius * rollRadius
-                                     + GE21NeuBkgParam4 * rollRadius * rollRadius * rollRadius * rollRadius
-                                     + GE21NeuBkgParam5 * rollRadius * rollRadius * rollRadius * rollRadius * rollRadius;
-    else
-      averageNeutralNoiseRatePerRoll = (GE21ModNeuBkgParam0
-					+ GE21ModNeuBkgParam1 * rollRadius
-					+ GE21ModNeuBkgParam2 * rollRadius * rollRadius);
-    //simulate electron background for GE2/1
+    averageNeutralNoiseRatePerRoll = ME0NeuBkgParam0 * rollRadius* TMath::Exp(ME0NeuBkgParam1/rSqrtR) + ME0NeuBkgParam2/rSqrtR + ME0NeuBkgParam3/(sqrt(rollRadius));
+
+//simulate electron background for ME0
     if (simulateElectronBkg_)
-      averageNoiseElectronRatePerRoll = (GE21ElecBkgParam0
-					 + GE21ElecBkgParam1 * rollRadius
-					 + GE21ElecBkgParam2 * rollRadius * rollRadius);
-    // Scale up/down for desired instantaneous lumi (reference is 5E34, double from config is in units of 1E34)
+    averageNoiseElectronRatePerRoll = ME0ElecBkgParam0 * rSqrtR* TMath::Exp(ME0ElecBkgParam1/rSqrtR) + ME0ElecBkgParam2/rSqrtR + ME0ElecBkgParam3/(sqrt(rollRadius));
+
     averageNoiseRatePerRoll = averageNeutralNoiseRatePerRoll + averageNoiseElectronRatePerRoll;
-    averageNoiseRatePerRoll *= instLumi_*rateFact_*1.0/referenceInstLumi;
+    averageNoiseRatePerRoll *= instLumi_*rateFact_*1.0/5;  
   }
+  
 //simulate intrinsic noise
   if(simulateIntrinsicNoise_)
   {
@@ -267,6 +225,7 @@ void GEMSimpleModel::simulateNoise(const GEMEtaPartition* roll, CLHEP::HepRandom
   const double averageNoise(averageNoiseRatePerRoll * nBxing * bxwidth_ * trArea * 1.0e-9);
   CLHEP::RandPoissonQ randPoissonQ(*engine, averageNoise);
   const int n_hits(randPoissonQ.fire());
+
   for (int i = 0; i < n_hits; ++i)
   {
     const int centralStrip(static_cast<int> (CLHEP::RandFlat::shoot(engine, 1, nstrips)));
@@ -304,10 +263,10 @@ void GEMSimpleModel::simulateNoise(const GEMEtaPartition* roll, CLHEP::HepRandom
   return;
 }
 
-std::vector<std::pair<int, int> > GEMSimpleModel::simulateClustering(const GEMEtaPartition* roll,
+std::vector<std::pair<int, int> > ME0SimpleModel::simulateClustering(const ME0EtaPartition* roll,
     const PSimHit* simHit, const int bx, CLHEP::HepRandomEngine* engine)
 {
-  const StripTopology& topology = roll->specificTopology(); // const LocalPoint& entry(simHit->entryPoint());
+  const StripTopology& topology = roll->specificTopology();
   const LocalPoint& hit_position(simHit->localPosition());
   const int nstrips(roll->nstrips());
   int centralStrip = 0;
