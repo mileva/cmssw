@@ -1,0 +1,37 @@
+%MSG-i PopCon:  RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@ctor  27-Nov-2017 18:00:28 CET pre-events
+This is PopCon (Populator of Condition) v5.0.
+Please report any problem and feature request through the JIRA project CMSCONDDB.
+
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@ctor  27-Nov-2017 18:00:28 CET pre-events
+Configuring Input Connection
+%MSG
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 at 27-Nov-2017 18:00:29.071 CET
+%MSG-i PopCon:  RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:29 CET PostGlobalEndRun
+payload name 
+%MSG
+%MSG-i PopCon:  RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:29 CET PostGlobalEndRun
+destination DB: sqlite_file:data/RPCLinkMap.db, target DB: sqlite_file:data/RPCLinkMap.db
+TAG: RPCDCCLinkMap_v1; First writer to this new tag.
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:29 CET PostGlobalEndRun
+getNewObjects
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:29 CET PostGlobalEndRun
+Opening read-only Input Session
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:31 CET PostGlobalEndRun
+Started Input Transaction
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:31 CET PostGlobalEndRun
+Execute query
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:33 CET PostGlobalEndRun
+Fill txtFile
+%MSG
+%MSG-i RPCDCCLinkMapHandler:   RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:33 CET PostGlobalEndRun
+Add to transfer list
+%MSG
+%MSG-i PopCon:  RPCDCCLinkMapPopConAnalyzer:RPCDCCLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:33 CET PostGlobalEndRun
+Since 1
+%MSG

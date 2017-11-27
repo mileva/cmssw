@@ -1,0 +1,25 @@
+%MSG-i PopCon:  RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@ctor  27-Nov-2017 18:00:44 CET pre-events
+This is PopCon (Populator of Condition) v5.0.
+Please report any problem and feature request through the JIRA project CMSCONDDB.
+
+%MSG
+Begin processing the 1st record. Run 1, Event 1, LumiSection 1 at 27-Nov-2017 18:00:44.627 CET
+%MSG-i PopCon:  RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+payload name 
+%MSG
+%MSG-i PopCon:  RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+destination DB: sqlite_file:data/RPCLinkMap.db, target DB: sqlite_file:data/RPCLinkMap.db
+TAG: RPCOMTFLinkMap_v1; First writer to this new tag.
+%MSG
+%MSG-i RPCAMCLinkMapHandler:   RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+getNewObjects
+%MSG
+%MSG-i RPCAMCLinkMapHandler:   RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+Fill txtFile
+%MSG
+%MSG-i RPCAMCLinkMapHandler:   RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+Add to transfer list
+%MSG
+%MSG-i PopCon:  RPCAMCLinkMapPopConAnalyzer:RPCOMTFLinkMapPopConAnalyzer@endJob  27-Nov-2017 18:00:44 CET PostGlobalEndRun
+Since 1
+%MSG

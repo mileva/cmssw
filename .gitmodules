@@ -1,0 +1,8 @@
+[submodule "DPGAnalysis/Tools"]
+	path = DPGAnalysis/Tools
+	url = https://github.com/fthyssen/dpg-analysis.git
+	branch = tools
+[submodule "DPGAnalysis/RPC"]
+	path = DPGAnalysis/RPC
+	url = https://github.com/fthyssen/dpg-analysis.git
+	branch = rpc
