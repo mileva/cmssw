@@ -1,0 +1,13 @@
+git cms-init
+git cms-merge-topic mileva:rpcDigiAna
+scram b -j 8
+
+## in order to access the files not only on eos, use yuor grid certificate
+voms-proxy-init --rfc --voms cms
+## your pass
+
+cd rpcDigis/RPCDigiAna/
+
+## edit the configuration file and put the relevant input files and gloabal tag
+cmsRun python/ConfFile_cfg.py
+
