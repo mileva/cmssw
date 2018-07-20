@@ -280,9 +280,9 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
 //      std::cout << rpcsrv.name() << " " << rpcsrv.segment() << " " << Y << std::endl;
         if (rpcDetId.station() == 1) {Diskp1Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp1DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
-        if (rpcDetId.station() == 2) {Diskp2Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp2DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
-        if (rpcDetId.station() == 3) {Diskp3Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp3DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
-        if (rpcDetId.station() == 4) {Diskp4Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp4DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
+        if (rpcDetId.station() == 2) {Diskp2Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp2DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp2DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
+        if (rpcDetId.station() == 3) {Diskp3Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp3DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp3DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
+        if (rpcDetId.station() == 4) {Diskp4Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp4DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp4DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
       }
       if (rpcDetId.region() == 0)
       {
