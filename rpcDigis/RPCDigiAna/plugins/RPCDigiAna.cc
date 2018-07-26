@@ -109,6 +109,8 @@ class RPCDigiAna : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
   TH2F *Wheelm1DigisToTime, *Wheel0DigisToTime, *Wheel1DigisToTime, *Wheelm2DigisToTime, *Wheel2DigisToTime;
 
   int numbEvents;
+  bool debug;
+
 };
 
 //
@@ -125,6 +127,7 @@ class RPCDigiAna : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 RPCDigiAna::RPCDigiAna(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
+  debug=iConfig.getUntrackedParameter<bool>("debug",false);
   inputRPC_PACT = consumes<RPCDigiCollection>(iConfig.getParameter<edm::InputTag>("srcRPC_PACT"));
   usesResource("TFileService");
 
@@ -218,25 +221,26 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    const LocalPoint& middleOfRoll = roll->centreOfStrip(middleStrip);
    const GlobalPoint& globMiddleRol = roll->toGlobal(middleOfRoll);
 
-   std::cout << "eta " << globMiddleRol.eta() << "\tphi " << globMiddleRol.phi() << std::endl;
+   if(debug) std::cout << "eta " << globMiddleRol.eta() << "\tphi " << globMiddleRol.phi() << std::endl;
 
 //take the list of fired strips for a given roll"
   int digisInRoll = 0;
   RPCDigiCollection::const_iterator digiItr; 
    for (digiItr = ((*it ).second).first; digiItr!=((*it).second).second; ++digiItr)
    {
+     int bx=(*digiItr).bx();
+     if (!(bx ==2)) continue;
      digisInRoll++;
      int strip= (*digiItr).strip();
-     int bx=(*digiItr).bx();
-     std::cout << "strip " <<  strip << "\tbx " <<  bx << std::endl;     
+     if(debug) std::cout << "strip " <<  strip << "\tbx " <<  bx << std::endl;     
 
 //take the global coordinates of the center of a given strip
      const LocalPoint& middleOfStrip = roll->centreOfStrip(strip);
      const GlobalPoint& globMiddleStrip = roll->toGlobal(middleOfStrip);
 
-     std::cout << "eta strip " << globMiddleStrip.eta() << "\tphi strip " << globMiddleStrip.phi() << std::endl;
+     if(debug) std::cout << "eta strip " << globMiddleStrip.eta() << "\tphi strip " << globMiddleStrip.phi() << std::endl;
    }
-   std::cout << "digis in roll " << digisInRoll << std::endl;
+   if(debug) std::cout << "digis in roll " << digisInRoll << std::endl;
 
     RPCGeomServ rpcsrv(rpcDetId);
     int rollY = rpcDetId.roll();
@@ -270,7 +274,7 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if (rpcDetId.region() == -1)
       {
-//      std::cout << rpcsrv.name() << " " << rpcsrv.segment() << " " << Y << std::endl;
+//      if(debug) std::cout << rpcsrv.name() << " " << rpcsrv.segment() << " " << Y << std::endl;
         if (rpcDetId.station() == 1) {Diskm1Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskm1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskm1DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
         if (rpcDetId.station() == 2) {Diskm2Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskm2DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskm2DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
         if (rpcDetId.station() == 3) {Diskm3Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskm3DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskm3DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
@@ -278,7 +282,7 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
       if (rpcDetId.region() == 1)
       {
-//      std::cout << rpcsrv.name() << " " << rpcsrv.segment() << " " << Y << std::endl;
+//      if(debug) std::cout << rpcsrv.name() << " " << rpcsrv.segment() << " " << Y << std::endl;
         if (rpcDetId.station() == 1) {Diskp1Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp1DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp1DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
         if (rpcDetId.station() == 2) {Diskp2Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp2DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp2DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
         if (rpcDetId.station() == 3) {Diskp3Digis_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll); Diskp3DigisToArea_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, (1.*digisInRoll)/area); Diskp3DigisToTime_Roll_vs_Sector_Disk->Fill(rpcsrv.segment(), Y, digisInRoll);}
@@ -290,14 +294,14 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           if (rpcDetId.ring() == 2)
           {
-//          std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
+//          if(debug) std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
             Wheel2Digis->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), digisInRoll);
             Wheel2DigisToArea->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), (1.*digisInRoll)/area);
             Wheel2DigisToTime->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), digisInRoll);
           }
           else
           {
-//          std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
+//          if(debug) std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
             Wheelm2Digis->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), digisInRoll);
             Wheelm2DigisToArea->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), (1.*digisInRoll)/area);
             Wheelm2DigisToTime->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesExter), digisInRoll);
@@ -307,28 +311,28 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           if (rpcDetId.ring() == -1)
           {
-//          std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
+//          if(debug) std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
             Wheelm1Digis->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
             Wheelm1DigisToArea->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), (1.*digisInRoll)/area);
             Wheelm1DigisToTime->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
           }
           else if (rpcDetId.ring() == 0)
           {
-//          std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
+//          if(debug) std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
             Wheel0Digis->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
             Wheel0DigisToArea->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), (1.*digisInRoll)/area);
             Wheel0DigisToTime->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
           }
           else if (rpcDetId.ring() == 1)
           {
-//          std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
+//          if(debug) std::cout<< "Wheel " << rpcDetId.ring() <<rollB(rpcsrv.shortname(),rollNamesExter)<<"--"<<rpcsrv.shortname()<<std::endl;
             Wheel1Digis->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
             Wheel1DigisToArea->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), (1.*digisInRoll)/area);
             Wheel1DigisToTime->Fill(rpcDetId.sector(), rollB(rpcsrv.shortname(), rollNamesInter), digisInRoll);
           }
         }
       }//end wheels
-  }
+  }//end rpcdetid
 }
 
 
@@ -370,7 +374,7 @@ RPCDigiAna::beginJob()
       if (roll == 3) binLabel << "Ring " << ri << " A";
       else if (roll == 2) binLabel << "Ring " << ri << " B";
       else if (roll == 1) binLabel << "Ring " << ri << " C";
-      //std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
+      //if(debug) std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
       Diskm4Digis_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm3Digis_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm2Digis_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
@@ -441,7 +445,7 @@ RPCDigiAna::beginJob()
       if (roll == 3) binLabel << "Ring " << ri << " A";
       else if (roll == 2) binLabel << "Ring " << ri << " B";
       else if (roll == 1) binLabel << "Ring " << ri << " C";
-      //std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
+      //if(debug) std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
       Diskm4DigisToArea_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm3DigisToArea_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm2DigisToArea_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
@@ -512,7 +516,7 @@ RPCDigiAna::beginJob()
       if (roll == 3) binLabel << "Ring " << ri << " A";
       else if (roll == 2) binLabel << "Ring " << ri << " B";
       else if (roll == 1) binLabel << "Ring " << ri << " C";
-      //std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
+      //if(debug) std::cout<<"Labeling EndCaps "<<binLabel.str()<<std::endl;
       Diskm4DigisToTime_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm3DigisToTime_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
       Diskm2DigisToTime_Roll_vs_Sector_Disk->GetYaxis()->SetBinLabel((ri - 1) * 3 + roll, binLabel.str().c_str());
@@ -558,8 +562,10 @@ RPCDigiAna::beginJob()
 void
 RPCDigiAna::endJob()
 {
-  std::cout << "numbEvents\t" << numbEvents << std::endl;  
-  double myTime = numbEvents * 25. * 1.0e-9 * 6.;	//6 bx windows [-2, 3]
+  if(debug) std::cout << "numbEvents\t" << numbEvents << std::endl;  
+//  double myTime = numbEvents * 25. * 1.0e-9 * 6.;	//6 bx windows [-2, 3]
+//  double myTime = numbEvents * 25. * 1.0e-9 * 5.;	//5 bx windows [-2, 3] BX 0
+  double myTime = numbEvents * 25. * 1.0e-9 * 1.;	//for only one BX window
 
 //FIXME configure the number of the lumi sections and the duration of one section
 //  double myTime = 1*23.8;
