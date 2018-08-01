@@ -110,6 +110,9 @@ class RPCDigiAna : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 
   int numbEvents;
   bool debug;
+  bool doAllBXs_;
+  int numbBXs_;
+  int bxInvest_;
 
 };
 
@@ -128,6 +131,9 @@ RPCDigiAna::RPCDigiAna(const edm::ParameterSet& iConfig)
 {
    //now do what ever initialization is needed
   debug=iConfig.getUntrackedParameter<bool>("debug",false);
+  doAllBXs_=iConfig.getUntrackedParameter<bool>("doAllBXs",true);
+  numbBXs_ = iConfig.getParameter<int>("numbBXs");
+  bxInvest_ = iConfig.getParameter<int>("bxInvest");
   inputRPC_PACT = consumes<RPCDigiCollection>(iConfig.getParameter<edm::InputTag>("srcRPC_PACT"));
   usesResource("TFileService");
 
@@ -229,8 +235,13 @@ RPCDigiAna::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    for (digiItr = ((*it ).second).first; digiItr!=((*it).second).second; ++digiItr)
    {
      int bx=(*digiItr).bx();
-     if (!(bx ==2)) continue;
-     digisInRoll++;
+     if (doAllBXs_)
+       digisInRoll++;
+     else
+     {
+       if (!(bx == bxInvest_)) continue;
+       digisInRoll++;
+     }
      int strip= (*digiItr).strip();
      if(debug) std::cout << "strip " <<  strip << "\tbx " <<  bx << std::endl;     
 
@@ -565,7 +576,9 @@ RPCDigiAna::endJob()
   if(debug) std::cout << "numbEvents\t" << numbEvents << std::endl;  
 //  double myTime = numbEvents * 25. * 1.0e-9 * 6.;	//6 bx windows [-2, 3]
 //  double myTime = numbEvents * 25. * 1.0e-9 * 5.;	//5 bx windows [-2, 3] BX 0
-  double myTime = numbEvents * 25. * 1.0e-9 * 1.;	//for only one BX window
+//  double myTime = numbEvents * 25. * 1.0e-9 * 1.;	//for only one BX window
+
+  double myTime = numbEvents * 25. * 1.0e-9 * numbBXs_;	//for only one BX window
 
 //FIXME configure the number of the lumi sections and the duration of one section
 //  double myTime = 1*23.8;

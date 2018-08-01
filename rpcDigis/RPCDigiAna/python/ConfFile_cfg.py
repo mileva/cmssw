@@ -34,7 +34,7 @@ process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag.globaltag = '101X_dataRun2_Express_v8'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(180120) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(5000))	#180120) )
 
 #process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -312,11 +312,15 @@ process.source = cms.Source("PoolSource",
 
 process.demo = cms.EDAnalyzer('RPCDigiAna'
      , debug = cms.untracked.bool(False)
+     , doAllBXs = cms.untracked.bool(False)	# default is True. If true, please put numbBXs=6, put False if you want to investigate only particular BX window
      , srcRPC_PACT = cms.InputTag('muonRPCDigis')
+     , numbBXs = cms.int32(1)		#default number is 6 bx windows [-2, 3], change this number regarding the mubmer of time windows (BXs) you are invstigating
+     , bxInvest = cms.int32(-2) 	#put the BX number that you want to investigate, doAllBXs should be set to True and numbBXs to 1. For the default options(i.e. all BX) this parameter will be skipped by the code. 
+
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('myoutput.root')
+    fileName = cms.string('myoutput_test.root')
 )
 
 #import PhysicsTools.PythonAnalysis.LumiList as LumiList

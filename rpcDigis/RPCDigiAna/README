@@ -1,3 +1,7 @@
+cmsrel CMSSW_10_1_9
+cd CMSSW_10_1_8/src
+cmsenv
+
 git cms-init
 git cms-merge-topic mileva:rpcDigiAna
 scram b -j 8
@@ -10,4 +14,18 @@ cd rpcDigis/RPCDigiAna/
 
 ## edit the configuration file and put the relevant input files and gloabal tag
 cmsRun python/ConfFile_cfg.py
+
+
+#########################################
+You may need to change the CMSSW version number and Global tag, regarding the data and runs that you are analysing
+For a given example the relevant information was taken from here:
+https://goo.gl/hbmmZg
+
+As an input data you need either RAW data or FEVT data format:
+For instance you may have a look on the list of the example input files
+or to check what is available on eos (also on the other CMS sides)
+ls /eos/cms/store/data/Run2018C/SingleMuon/RAW
+
+In order to have good statistics it is better to run over larged number of events (> 100000)
+
 
