@@ -162,7 +162,7 @@ process.demo = cms.EDAnalyzer('RateVsLumi'
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('myoutput_rechits_lumi_323525_2Mevt.root')
+    fileName = cms.string('myoutput_digi_lumi_test.root')
 )
 
 #import PhysicsTools.PythonAnalysis.LumiList as LumiList

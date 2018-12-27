@@ -21,6 +21,7 @@
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
+// #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/ESTransientHandle.h"
@@ -67,6 +68,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TTree.h"
 
 #include "Geometry/Records/interface/MuonGeometryRecord.h"
 #include "Geometry/RPCGeometry/interface/RPCGeometry.h"
@@ -86,11 +88,83 @@
 #include "TGraph.h"
 #include "TGraphErrors.h"
 
+
 //
 // class declaration
 //
+using namespace std;
+using namespace edm;
 
-class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+struct RPCEvent{
+
+
+  // event information
+  int nRun;
+  int nEv;
+  int nLumi;
+  int nBX;	
+
+  int Ls;
+  double Lumi;
+  double Rate;
+
+  double RB1inHits;
+  double RB1outHits;
+  double RB2inHits;
+  double RB2outHits;
+  double RB3Hits;
+  double RB4Hits;
+  double BHits;
+  double Wp2Hits;
+  double Wp1Hits;
+  double W0Hits;
+  double Wm1Hits;
+  double Wm2Hits;
+  double REpHits;
+  double REmHits;
+  double REp1Hits;
+  double REp2Hits;
+  double REp3Hits;
+  double REp4Hits;
+  double REm1Hits;
+  double REm2Hits;
+  double REm3Hits;
+  double REm4Hits;
+
+  double areaRB1in ;
+  double areaRB1out ;
+  double areaRB2in ;
+  double areaRB2out ;
+  double areaRB3 ;
+  double areaRB4 ;
+  double areaB ;
+  double areaWp2 ;
+  double areaWp1 ;
+  double areaW0 ;
+  double areaWm1 ;
+  double areaWm2 ;
+
+  double areaREp ;
+  double areaREm ;
+  double areaREp1 ;
+  double areaREp2 ;
+  double areaREp3 ;
+  double areaREp4 ;
+  double areaREm1 ;
+  double areaREm2 ;
+  double areaREm3 ;
+  double areaREm4 ;
+
+
+
+	// int myScale;
+
+};
+
+
+class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>  
+// class RateVsLumi : public edm::EDAnalyzer  
+{
    public:
       explicit RateVsLumi(const edm::ParameterSet&);
       ~RateVsLumi();
@@ -176,6 +250,15 @@ class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //areas
   double areaRB1in, areaRB1out, areaRB2in, areaRB2out, areaRB3, areaRB4, areaB, areaWp2, areaWp1, areaW0, areaWm1, areaWm2;
   double areaREp, areaREm, areaREp1, areaREp2, areaREp3, areaREp4, areaREm1, areaREm2, areaREm3, areaREm4;
+
+	edm::Service<TFileService> fs;
+
+
+	bool debug1;
+  TTree * RPCTree_;
+  RPCEvent rpcev_;
+
+
 };
 
 RateVsLumi::RateVsLumi(const edm::ParameterSet& iConfig)
@@ -200,6 +283,16 @@ RateVsLumi::~RateVsLumi()
 void
 RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+
+  memset(&rpcev_,0,sizeof rpcev_);
+	debug1=true;
+  //  cout <<"Got data"<<endl;
+  rpcev_.nEv = (int)iEvent.id().event();
+  rpcev_.nRun = (int)iEvent.id().run();
+  rpcev_.nLumi = (int)iEvent.luminosityBlock();
+  rpcev_.nBX = (int)iEvent.bunchCrossing();
+
+
   numbEvents->Fill(1);
   using namespace edm;
 //areas
@@ -240,6 +333,12 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   lumiblock = iEvent.getLuminosityBlock().luminosityBlock();
   lumiperblock = lumiperblock*1./1000.;	//10^33
 //  lumiperblock = std::floor((lumiperblock * 100.) + 0.5) / 100.;
+
+	rpcev_.Ls= lumiblock;
+	rpcev_.Lumi=lumiperblock;
+
+
+	if(debug1) cout<<"Ls = "<<lumiblock<<" , Lumi = "<<lumiperblock<<endl;
 
   if (debug) std::cout << "lumi section = " << lumiblock << "\tinst. lumi = " << lumiperblock << " x 10^33 Hz/cm^2" << std::endl;
   pairLsLumi.insert ( std::pair<int,double>(lumiblock,lumiperblock));
@@ -345,12 +444,14 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
         areaREm+=area;
         std::map<int, double>::iterator lb = pairLsRateREm.find(lumiblock);
+				rpcev_.REmHits+=countRecHits;
         if(lb != pairLsRateREm.end()) lb->second += countRecHits;
         else pairLsRateREm.insert ( std::pair<int,double>(lumiblock,countRecHits));
         if (rpcId.station() == 1)
         {
           areaREm1+=area;
           std::map<int, double>::iterator lb = pairLsRateREm1.find(lumiblock);
+					rpcev_.REm1Hits+=countRecHits;
           if(lb != pairLsRateREm1.end()) lb->second += countRecHits;
           else pairLsRateREm1.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -358,6 +459,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREm2+=area;
           std::map<int, double>::iterator lb = pairLsRateREm2.find(lumiblock);
+					rpcev_.REm2Hits+=countRecHits;
           if(lb != pairLsRateREm2.end()) lb->second += countRecHits;
           else pairLsRateREm2.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -365,6 +467,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREm3+=area;
           std::map<int, double>::iterator lb = pairLsRateREm3.find(lumiblock);
+					rpcev_.REm3Hits+=countRecHits;
           if(lb != pairLsRateREm3.end()) lb->second += countRecHits;
           else pairLsRateREm3.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -372,6 +475,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREm4+=area;
           std::map<int, double>::iterator lb = pairLsRateREm4.find(lumiblock);
+					rpcev_.REm4Hits+=countRecHits;
           if(lb != pairLsRateREm4.end()) lb->second += countRecHits;
           else pairLsRateREm4.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -381,12 +485,14 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
         areaREp+=area;
         std::map<int, double>::iterator lb = pairLsRateREp.find(lumiblock);
+				rpcev_.REpHits+=countRecHits;
         if(lb != pairLsRateREp.end()) lb->second += countRecHits;
         else pairLsRateREp.insert ( std::pair<int,double>(lumiblock,countRecHits));
         if (rpcId.station() == 1)
         {
           areaREp1+=area;
           std::map<int, double>::iterator lb = pairLsRateREp1.find(lumiblock);
+					rpcev_.REp1Hits+=countRecHits;
           if(lb != pairLsRateREp1.end()) lb->second += countRecHits;
           else pairLsRateREp1.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -394,6 +500,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREp2+=area;
           std::map<int, double>::iterator lb = pairLsRateREp2.find(lumiblock);
+					rpcev_.REp2Hits+=countRecHits;
           if(lb != pairLsRateREp2.end()) lb->second += countRecHits;
           else pairLsRateREp2.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -401,6 +508,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREp3+=area;
           std::map<int, double>::iterator lb = pairLsRateREp3.find(lumiblock);
+					rpcev_.REp3Hits+=countRecHits;
           if(lb != pairLsRateREp3.end()) lb->second += countRecHits;
           else pairLsRateREp3.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -408,6 +516,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaREp4+=area;
           std::map<int, double>::iterator lb = pairLsRateREp4.find(lumiblock);
+					rpcev_.REp4Hits+=countRecHits;
           if(lb != pairLsRateREp4.end()) lb->second += countRecHits;
           else pairLsRateREp4.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }
@@ -417,6 +526,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       {
         areaB +=area;
         std::map<int, double>::iterator lb = pairLsRateB.find(lumiblock);
+				rpcev_.BHits+=countRecHits;
         if(lb != pairLsRateB.end()) lb->second += countRecHits;
         else pairLsRateB.insert ( std::pair<int,double>(lumiblock,countRecHits));
         if(rpcId.station() == 1)
@@ -425,6 +535,8 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaRB1in +=area;
             std::map<int, double>::iterator lb = pairLsRateRB1in.find(lumiblock);
+						rpcev_.RB1inHits+=countRecHits;
+						// cout<<"rpcev_.RB1inHits = "<<rpcev_.RB1inHits<<" , countRecHits = "<<countRecHits<<endl;
             if(lb != pairLsRateRB1in.end()) lb->second += countRecHits;
             else pairLsRateRB1in.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }
@@ -432,6 +544,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaRB1out +=area;
             std::map<int, double>::iterator lb = pairLsRateRB1out.find(lumiblock);
+						rpcev_.RB1outHits+=countRecHits;
             if(lb != pairLsRateRB1out.end()) lb->second += countRecHits;
             else pairLsRateRB1out.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }
@@ -443,6 +556,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaRB2in +=area;
             std::map<int, double>::iterator lb = pairLsRateRB2in.find(lumiblock);
+						rpcev_.RB2inHits+=countRecHits;
             if(lb != pairLsRateRB2in.end()) lb->second += countRecHits;
             else pairLsRateRB2in.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }
@@ -450,6 +564,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaRB2out +=area;
             std::map<int, double>::iterator lb = pairLsRateRB2out.find(lumiblock);
+						rpcev_.RB2outHits+=countRecHits;
             if(lb != pairLsRateRB2out.end()) lb->second += countRecHits;
             else pairLsRateRB2out.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }
@@ -459,6 +574,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaRB3 +=area;
           std::map<int, double>::iterator lb = pairLsRateRB3.find(lumiblock);
+					rpcev_.RB3Hits+=countRecHits;
           if(lb != pairLsRateRB3.end()) lb->second += countRecHits;
           else pairLsRateRB3.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }//end RB3
@@ -466,6 +582,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         {
           areaRB4 +=area;
           std::map<int, double>::iterator lb = pairLsRateRB4.find(lumiblock);
+					rpcev_.RB4Hits+=countRecHits;
           if(lb != pairLsRateRB4.end()) lb->second += countRecHits;
           else pairLsRateRB4.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }//end RB4
@@ -475,6 +592,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaWp2 +=area;
             std::map<int, double>::iterator lb = pairLsRateWp2.find(lumiblock);
+						rpcev_.Wp2Hits+=countRecHits;
             if(lb != pairLsRateWp2.end()) lb->second += countRecHits;
             else pairLsRateWp2.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//W+2
@@ -482,6 +600,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaWm2 +=area;
             std::map<int, double>::iterator lb = pairLsRateWm2.find(lumiblock);
+						rpcev_.Wm2Hits+=countRecHits;
             if(lb != pairLsRateWm2.end()) lb->second += countRecHits;
             else pairLsRateWm2.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//W-2
@@ -492,6 +611,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaWm1 +=area;
             std::map<int, double>::iterator lb = pairLsRateWm1.find(lumiblock);
+						rpcev_.Wm1Hits+=countRecHits;
             if(lb != pairLsRateWm1.end()) lb->second += countRecHits;
             else pairLsRateWm1.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//Wm1
@@ -499,6 +619,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaW0 +=area;
             std::map<int, double>::iterator lb = pairLsRateW0.find(lumiblock);
+						rpcev_.W0Hits+=countRecHits;
             if(lb != pairLsRateW0.end()) lb->second += countRecHits;
             else pairLsRateW0.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//W0
@@ -506,21 +627,134 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           {
             areaWp1 +=area;
             std::map<int, double>::iterator lb = pairLsRateWp1.find(lumiblock);
+						rpcev_.Wp1Hits+=countRecHits;
             if(lb != pairLsRateWp1.end()) lb->second += countRecHits;
             else pairLsRateWp1.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//W+1
         }
       }//end barrel
   }//loop over rolls
-}
+
+  rpcev_.areaRB1in  =  areaRB1in ;   
+  rpcev_.areaRB1out =  areaRB1out;
+  rpcev_.areaRB2in  =  areaRB2in ;
+  rpcev_.areaRB2out =  areaRB2out;
+  rpcev_.areaRB3    =  areaRB3 ; 
+  rpcev_.areaRB4    =  areaRB4  ;
+  rpcev_.areaB      =  areaB  ;
+  rpcev_.areaWp2    =  areaWp2 ; 
+  rpcev_.areaWp1    =  areaWp1  ;
+  rpcev_.areaW0     =  areaW0  ;
+  rpcev_.areaWm1    =  areaWm1  ;
+  rpcev_.areaWm2    =  areaWm2  ;
+  rpcev_.areaREp    =  areaREp  ;
+  rpcev_.areaREm    =  areaREm ; 
+  rpcev_.areaREp1   =  areaREp1  ;
+  rpcev_.areaREp2   =  areaREp2  ;
+  rpcev_.areaREp3   =  areaREp3  ;
+  rpcev_.areaREp4   =  areaREp4  ;
+  rpcev_.areaREm1   =  areaREm1  ;
+  rpcev_.areaREm2   =  areaREm2  ;
+  rpcev_.areaREm3   =  areaREm3  ;
+  rpcev_.areaREm4   =  areaREm4  ;
+
+
+
+
+
+
+
+
+	// cout<<"areaRB1in = "<<areaRB1in<<endl;
+	// cout<<"rpcev_.RB1inHits = "<<rpcev_.RB1inHits<<endl;
+
+  //std::map<int, double>::iterator lb = pairLsRateRB1in.find(lumiblock);
+	// for (auto &it : pairLsRateRB1in){
+		// cout<<"pairLsRate first (LS) "<<it.first<<"pairLsRateRB1in second (RB1in)"<<it.second<<endl;
+	// }
+
+  RPCTree_->Fill();
+  memset(&rpcev_,0,sizeof rpcev_);
+
+} // end RateVsLumi:analyzer
 
 
 // ------------ method called once each job just before starting event loop  ------------
 void
 RateVsLumi::beginJob()
 {
-  edm::Service <TFileService> fs;
+  // edm::Service <TFileService> fs;
 // number of events
+
+  RPCTree_ = fs->make<TTree>("nt","");
+
+  // event
+  RPCTree_->Branch("nEv",&rpcev_.nEv,"nEv/I");
+  RPCTree_->Branch("nLumi",&rpcev_.nLumi,"nLumi/I");
+  RPCTree_->Branch("nBX",&rpcev_.nBX,"nBX/I");
+  RPCTree_->Branch("nRun",&rpcev_.nRun,"nRun/I");
+
+	//
+  RPCTree_->Branch("Ls",&rpcev_.Ls,"Ls/I");
+  RPCTree_->Branch("Lumi",&rpcev_.Lumi,"Lumi/D");
+  RPCTree_->Branch("Rate",&rpcev_.Rate,"Rate/D");
+
+  RPCTree_->Branch("RB1inHits",&rpcev_.RB1inHits,"RB1inHits/D");
+  // RPCTree_->Branch("areaRB1in",&rpcev_.areaRB1in,"areaRB1in/D");
+
+
+  RPCTree_->Branch("RB1outHits",&rpcev_.RB1outHits,"RB1outHits/D");
+  RPCTree_->Branch("RB2inHits",&rpcev_.RB2inHits,"RB2inHits/D");
+  RPCTree_->Branch("RB2outHits",&rpcev_.RB2outHits,"RB2outHits/D");
+  RPCTree_->Branch("RB3Hits",&rpcev_.RB3Hits,"RB3Hits/D");
+  RPCTree_->Branch("RB4Hits",&rpcev_.RB4Hits,"RB4Hits/D");
+  RPCTree_->Branch("BHits",&rpcev_.BHits,"BHits/D");
+  RPCTree_->Branch("Wp2Hits",&rpcev_.Wp2Hits,"Wp2Hits/D");
+  RPCTree_->Branch("Wp1Hits",&rpcev_.Wp1Hits,"Wp1Hits/D");
+  RPCTree_->Branch("W0Hits",&rpcev_.W0Hits,"W0Hits/D");
+  RPCTree_->Branch("Wm1Hits",&rpcev_.Wm1Hits,"Wm1Hits/D");
+  RPCTree_->Branch("Wm2Hits",&rpcev_.Wm2Hits,"Wm2Hits/D");
+  RPCTree_->Branch("REpHits",&rpcev_.REpHits,"REpHits/D");
+  RPCTree_->Branch("REmHits",&rpcev_.REmHits,"REmHits/D");
+  RPCTree_->Branch("REp1Hits",&rpcev_.REp1Hits,"REp1Hits/D");
+  RPCTree_->Branch("REp2Hits",&rpcev_.REp2Hits,"REp2Hits/D");
+  RPCTree_->Branch("REp3Hits",&rpcev_.REp3Hits,"REp3Hits/D");
+  RPCTree_->Branch("REp4Hits",&rpcev_.REp4Hits,"REp4Hits/D");
+  RPCTree_->Branch("REm1Hits",&rpcev_.REm1Hits,"REm1Hits/D");
+  RPCTree_->Branch("REm2Hits",&rpcev_.REm2Hits,"REm2Hits/D");
+  RPCTree_->Branch("REm3Hits",&rpcev_.REm3Hits,"REm3Hits/D");
+  RPCTree_->Branch("REm4Hits",&rpcev_.REm4Hits,"REm4Hits/D");
+
+  RPCTree_->Branch("areaRB1in",&rpcev_.areaRB1in,"areaRB1in/D");
+  RPCTree_->Branch("areaRB1out",&rpcev_.areaRB1out,"areaRB1out/D");
+  RPCTree_->Branch("areaRB2in",&rpcev_.areaRB2in,"areaRB2in/D");
+  RPCTree_->Branch("areaRB2out",&rpcev_.areaRB2out,"areaRB2out/D");
+  RPCTree_->Branch("areaRB3",&rpcev_.areaRB3,"areaRB3/D");
+  RPCTree_->Branch("areaRB4",&rpcev_.areaRB4,"areaRB4/D");
+  RPCTree_->Branch("areaB",&rpcev_.areaB,"areaB/D");
+  RPCTree_->Branch("areaWp2",&rpcev_.areaWp2,"areaWp2/D");
+  RPCTree_->Branch("areaWp1",&rpcev_.areaWp1,"areaWp1/D");
+  RPCTree_->Branch("areaW0",&rpcev_.areaW0,"areaW0/D");
+  RPCTree_->Branch("areaWm1",&rpcev_.areaWm1,"areaWm1/D");
+  RPCTree_->Branch("areaWm2",&rpcev_.areaWm2,"areaWm2/D");
+  RPCTree_->Branch("areaREp",&rpcev_.areaREp,"areaREp/D");
+  RPCTree_->Branch("areaREm",&rpcev_.areaREm,"areaREm/D");
+  RPCTree_->Branch("areaREp1",&rpcev_.areaREp1,"areaREp1/D");
+  RPCTree_->Branch("areaREp2",&rpcev_.areaREp2,"areaREp2/D");
+  RPCTree_->Branch("areaREp3",&rpcev_.areaREp3,"areaREp3/D");
+  RPCTree_->Branch("areaREp4",&rpcev_.areaREp4,"areaREp4/D");
+  RPCTree_->Branch("areaREm1",&rpcev_.areaREm1,"areaREm1/D");
+  RPCTree_->Branch("areaREm2",&rpcev_.areaREm2,"areaREm2/D");
+  RPCTree_->Branch("areaREm3",&rpcev_.areaREm3,"areaREm3/D");
+  RPCTree_->Branch("areaREm4",&rpcev_.areaREm4,"areaREm4/D");
+
+
+
+
+
+
+//  RPCTree_->Branch("myScale",&rpcev_.myScale,"myScale/D");
+
   numbEvents =fs->make<TH1F>("numbEvents", "numbEvents", 2, 0., 2.);
 
 /////////// test lumi counts
