@@ -31,6 +31,49 @@ public :
    Double_t        Rate;
    Double_t        RB1inHits;
    Double_t        areaRB1in;
+//rumi
+   Double_t        RB1outHits;
+   Double_t        areaRB1out;
+   Double_t        RB2inHits;
+   Double_t        RB2outHits;
+   Double_t        RB3Hits;
+   Double_t        RB4Hits;
+   Double_t        BHits;
+   Double_t        Wp2Hits;
+   Double_t        Wp1Hits;
+   Double_t        W0Hits;
+   Double_t        Wm1Hits;
+   Double_t        Wm2Hits;
+   Double_t        REpHits;
+   Double_t        REmHits;
+   Double_t        REp1Hits;
+   Double_t        REp2Hits;
+   Double_t        REp3Hits;
+   Double_t        REp4Hits;
+   Double_t        REm1Hits;
+   Double_t        REm2Hits;
+   Double_t        REm3Hits;
+   Double_t        REm4Hits;
+   Double_t        areaRB2in;
+   Double_t        areaRB2out;
+   Double_t        areaRB3;
+   Double_t        areaRB4;
+   Double_t        areaB;
+   Double_t        areaWp2;
+   Double_t        areaWp1;
+   Double_t        areaW0;
+   Double_t        areaWm1;
+   Double_t        areaWm2;
+   Double_t        areaREp;
+   Double_t        areaREm;
+   Double_t        areaREp1;
+   Double_t        areaREp2;
+   Double_t        areaREp3;
+   Double_t        areaREp4;
+   Double_t        areaREm1;
+   Double_t        areaREm2;
+   Double_t        areaREm3;
+   Double_t        areaREm4; 
 
    // List of branches
    TBranch        *b_nEv;   //!
@@ -42,6 +85,49 @@ public :
    TBranch        *b_Rate;   //!
    TBranch        *b_RB1inHits;   //!
    TBranch        *b_areaRB1in;   //!
+//rumi
+   TBranch        *b_RB1outHits;   //!
+   TBranch        *b_areaRB1out;   //!
+   TBranch        *b_RB2inHits;
+   TBranch        *b_RB2outHits;
+   TBranch        *b_RB3Hits;
+   TBranch        *b_RB4Hits;
+   TBranch        *b_BHits;
+   TBranch        *b_Wp2Hits;
+   TBranch        *b_Wp1Hits;
+   TBranch        *b_W0Hits;
+   TBranch        *b_Wm1Hits;
+   TBranch        *b_Wm2Hits;
+   TBranch        *b_REpHits;
+   TBranch        *b_REmHits;
+   TBranch        *b_REp1Hits;
+   TBranch        *b_REp2Hits;
+   TBranch        *b_REp3Hits;
+   TBranch        *b_REp4Hits;
+   TBranch        *b_REm1Hits;
+   TBranch        *b_REm2Hits;
+   TBranch        *b_REm3Hits;
+   TBranch        *b_REm4Hits;
+   TBranch        *b_areaRB2in;
+   TBranch        *b_areaRB2out;
+   TBranch        *b_areaRB3;
+   TBranch        *b_areaRB4;
+   TBranch        *b_areaB;
+   TBranch        *b_areaWp2;
+   TBranch        *b_areaWp1;
+   TBranch        *b_areaW0;
+   TBranch        *b_areaWm1;
+   TBranch        *b_areaWm2;
+   TBranch        *b_areaREp;
+   TBranch        *b_areaREm;
+   TBranch        *b_areaREp1;
+   TBranch        *b_areaREp2;
+   TBranch        *b_areaREp3;
+   TBranch        *b_areaREp4;
+   TBranch        *b_areaREm1;
+   TBranch        *b_areaREm2;
+   TBranch        *b_areaREm3;
+   TBranch        *b_areaREm4;
 
    nt(TTree *tree=0);
    virtual ~nt();
@@ -62,11 +148,11 @@ nt::nt(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../crabtest.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("crabtest.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../crabtest.root");
+         f = new TFile("crabtest.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("../crabtest.root:/demo");
+      TDirectory * dir = (TDirectory*)f->Get("crabtest.root:/demo");
       dir->GetObject("nt",tree);
 
    }
@@ -123,6 +209,50 @@ void nt::Init(TTree *tree)
    fChain->SetBranchAddress("Rate", &Rate, &b_Rate);
    fChain->SetBranchAddress("RB1inHits", &RB1inHits, &b_RB1inHits);
    fChain->SetBranchAddress("areaRB1in", &areaRB1in, &b_areaRB1in);
+//rumi
+   fChain->SetBranchAddress("RB1outHits", &RB1outHits, &b_RB1outHits);
+   fChain->SetBranchAddress("areaRB1out", &areaRB1out, &b_areaRB1out);
+   fChain->SetBranchAddress("RB2inHits", &RB2inHits, &b_RB2inHits);
+   fChain->SetBranchAddress("areaRB2in", &areaRB2in, &b_areaRB2in);
+   fChain->SetBranchAddress("RB2outHits", &RB2outHits, &b_RB2outHits);
+   fChain->SetBranchAddress("areaRB2out", &areaRB2out, &b_areaRB2out);
+   fChain->SetBranchAddress("RB3Hits", &RB3Hits, &b_RB3Hits);
+   fChain->SetBranchAddress("areaRB3", &areaRB3, &b_areaRB3);
+   fChain->SetBranchAddress("RB4Hits", &RB4Hits, &b_RB4Hits);
+   fChain->SetBranchAddress("areaRB4", &areaRB4, &b_areaRB4);
+   fChain->SetBranchAddress("Wp2Hits", &Wp2Hits, &b_Wp2Hits);
+   fChain->SetBranchAddress("areaWp2", &areaWp2, &b_areaWp2);
+   fChain->SetBranchAddress("Wp1Hits", &Wp1Hits, &b_Wp1Hits);
+   fChain->SetBranchAddress("areaWp1", &areaWp1, &b_areaWp1);
+   fChain->SetBranchAddress("Wm2Hits", &Wm2Hits, &b_Wm2Hits);
+   fChain->SetBranchAddress("areaWm2", &areaWm2, &b_areaWm2);
+   fChain->SetBranchAddress("Wm1Hits", &Wm1Hits, &b_Wm1Hits);
+   fChain->SetBranchAddress("areaWm1", &areaWm1, &b_areaWm1);
+   fChain->SetBranchAddress("W0Hits", &W0Hits, &b_W0Hits);
+   fChain->SetBranchAddress("areaW0", &areaW0, &b_areaW0);
+   fChain->SetBranchAddress("BHits", &BHits, &b_BHits);
+
+   fChain->SetBranchAddress("REm1Hits", &REm1Hits, &b_REm1Hits);
+   fChain->SetBranchAddress("areaREm1", &areaREm1, &b_areaREm1);
+   fChain->SetBranchAddress("REm2Hits", &REm2Hits, &b_REm2Hits);
+   fChain->SetBranchAddress("areaREm2", &areaREm2, &b_areaREm2);
+   fChain->SetBranchAddress("REm3Hits", &REm3Hits, &b_REm3Hits);
+   fChain->SetBranchAddress("areaREm3", &areaREm3, &b_areaREm3);
+   fChain->SetBranchAddress("REm4Hits", &REm4Hits, &b_REm4Hits);
+   fChain->SetBranchAddress("areaREm4", &areaREm4, &b_areaREm4);
+   fChain->SetBranchAddress("REp1Hits", &REp1Hits, &b_REp1Hits);
+   fChain->SetBranchAddress("areaREp1", &areaREp1, &b_areaREp1);
+   fChain->SetBranchAddress("REp2Hits", &REp2Hits, &b_REp2Hits);
+   fChain->SetBranchAddress("areaREp2", &areaREp2, &b_areaREp2);
+   fChain->SetBranchAddress("REp3Hits", &REp3Hits, &b_REp3Hits);
+   fChain->SetBranchAddress("areaREp3", &areaREp3, &b_areaREp3);
+   fChain->SetBranchAddress("REp4Hits", &REp4Hits, &b_REp4Hits);
+   fChain->SetBranchAddress("areaREp4", &areaREp4, &b_areaREp4);
+   fChain->SetBranchAddress("REpHits", &REpHits, &b_REpHits);
+   fChain->SetBranchAddress("areaREp", &areaREp, &b_areaREp);
+   fChain->SetBranchAddress("REmHits", &REmHits, &b_REmHits);
+   fChain->SetBranchAddress("areaREm", &areaREm, &b_areaREm);
+
    Notify();
 }
 
