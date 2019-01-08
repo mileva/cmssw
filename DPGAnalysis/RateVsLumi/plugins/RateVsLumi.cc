@@ -246,6 +246,7 @@ class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>
   bool doOnlyOneBX_;
   int numbBXs_;
   int bxInvest_;
+  bool doRechits_;
 
 //areas
   double areaRB1in, areaRB1out, areaRB2in, areaRB2out, areaRB3, areaRB4, areaB, areaWp2, areaWp1, areaW0, areaWm1, areaWm2;
@@ -253,11 +254,9 @@ class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
 	edm::Service<TFileService> fs;
 
-
 	bool debug1;
   TTree * RPCTree_;
   RPCEvent rpcev_;
-
 
 };
 
@@ -272,6 +271,7 @@ RateVsLumi::RateVsLumi(const edm::ParameterSet& iConfig)
   rpcRecHitsLabel = consumes<RPCRecHitCollection>(iConfig.getUntrackedParameter < edm::InputTag > ("rpcRecHits_tag"));
   scalersSource_ = iConfig.getParameter<edm::InputTag>("scalersResults");
   scalersSourceToken_ = consumes<LumiScalersCollection>(edm::InputTag(scalersSource_));
+  doRechits_=iConfig.getUntrackedParameter<bool>("doRechits",true);
   usesResource("TFileService");
 
 }
@@ -422,21 +422,19 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
       if (doAllBXs_)
       {
-        countRecHits++;
-//        countRecHits +=cluSize;
-        if (debug) cout<<"rechits cout if all BX"<<countRecHits<<endl;
+        if (doRechits_)		countRecHits++;
+        else			countRecHits +=cluSize;	//take digis of a given rechit
       }
       if (doAllBXno0_ && bx!=0)
       {
-        countRecHits++;
-//        countRecHits +=cluSize;
+        if (doRechits_)		countRecHits++;
+        else			countRecHits +=cluSize;	//take digis of a given rechit
       }
       if (doOnlyOneBX_)
       {
         if (!(bx == bxInvest_)) continue;       
-        countRecHits++;
-//        countRecHits +=cluSize;
-        if (debug) cout<<"rechits count if not  all BX"<<countRecHits<<endl;
+        if (doRechits_)		countRecHits++;
+        else			countRecHits +=cluSize;	//take digis of a given rechit
      }      
     }//loop over rechits in a given roll
 

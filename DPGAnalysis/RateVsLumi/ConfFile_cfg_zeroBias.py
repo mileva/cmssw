@@ -34,7 +34,7 @@ process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag.globaltag = '102X_dataRun2_Prompt_v7'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(200))	#180120) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))	#180120) )
 
 #process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
@@ -159,10 +159,16 @@ process.demo = cms.EDAnalyzer('RateVsLumi'
      , numbBXs = cms.int32(6)		#default number is 6 bx windows [-2, 3], change this number regarding the mubmer of time windows (BXs) you are investigating
      , bxInvest = cms.int32(-2) 	#put the BX number that you want to investigate, doAllBXs should be set to False and numbBXs to 1. For the default options(i.e. all BX) this parameter will be skipped by the code. 
      ,scalersResults = cms.InputTag("scalersRawToDigi")
+     , doRechits = cms.untracked.bool(False)	# default is True. # If true, the rate is counted from the rpc rechits.
+# If False the rate will be counted from digis (belonging to the rechits,
+# i.e. raw digis not entered in the reconstrcutions will not be counted)
+# to run over all the digis the input dataformat should be changed.
+# Reco format does not contain raw digis
+
 )
 
 process.TFileService = cms.Service("TFileService",
-    fileName = cms.string('myoutput_digi_lumi_test.root')
+    fileName = cms.string('rpc_rechits_lumi_ZBpr2018D.root')
 )
 
 #import PhysicsTools.PythonAnalysis.LumiList as LumiList
