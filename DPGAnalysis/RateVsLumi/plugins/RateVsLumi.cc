@@ -87,6 +87,8 @@
 
 #include "TGraph.h"
 #include "TGraphErrors.h"
+#include <algorithm>
+#include <fstream>
 
 
 //
@@ -248,6 +250,13 @@ class RateVsLumi : public edm::one::EDAnalyzer<edm::one::SharedResources>
   int bxInvest_;
   bool doRechits_;
 
+  bool anaREm_;
+  bool anaREp_;
+  bool anaW_;
+  int myWheel_;
+
+  std::string myBlackList_;
+
 //areas
   double areaRB1in, areaRB1out, areaRB2in, areaRB2out, areaRB3, areaRB4, areaB, areaWp2, areaWp1, areaW0, areaWm1, areaWm2;
   double areaREp, areaREm, areaREp1, areaREp2, areaREp3, areaREp4, areaREm1, areaREm2, areaREm3, areaREm4;
@@ -272,8 +281,13 @@ RateVsLumi::RateVsLumi(const edm::ParameterSet& iConfig)
   scalersSource_ = iConfig.getParameter<edm::InputTag>("scalersResults");
   scalersSourceToken_ = consumes<LumiScalersCollection>(edm::InputTag(scalersSource_));
   doRechits_=iConfig.getUntrackedParameter<bool>("doRechits",true);
-  usesResource("TFileService");
 
+  anaREm_=iConfig.getUntrackedParameter<bool>("anaREm",true);
+  anaREp_=iConfig.getUntrackedParameter<bool>("anaREp",true);
+  anaW_=iConfig.getUntrackedParameter<bool>("anaW",true);
+  myWheel_ = iConfig.getParameter<int>("myWheel");
+  myBlackList_ = iConfig.getParameter<std::string>("myBlackList");
+  usesResource("TFileService");
 }
 
 RateVsLumi::~RateVsLumi()
@@ -283,6 +297,23 @@ RateVsLumi::~RateVsLumi()
 void
 RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  using namespace std;
+  fstream myBlListStream;
+  uint32_t myId;
+  string myName;
+  std::vector<uint32_t> idBlackList;
+
+
+  myBlListStream.open(myBlackList_, ios::in);	//map the names and rollIds
+  for (; myBlListStream >> myName >> myId;)
+  {
+#ifdef debug
+    cout << myId << "\t"<< myName << endl;
+#endif
+    idBlackList.push_back(myId);
+  }
+  myBlListStream.close();
+
 
   memset(&rpcev_,0,sizeof rpcev_);
 	debug1=true;
@@ -367,6 +398,11 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   {
     RPCDetId rpcId =  rls[i]->id();
 
+//////////////////////
+if (std::find(idBlackList.begin(), idBlackList.end(), rpcId) != idBlackList.end())
+   continue;
+//////////////////////////
+
     const RPCRoll* roll = dynamic_cast<const RPCRoll*>(rpcGeom->roll(rpcId));
     if(debug) std::cout<<"roll"<<roll<<std::endl;
     //take the global coordiantes of the center of the rpc roll (eta partition)
@@ -438,7 +474,8 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
      }      
     }//loop over rechits in a given roll
 
-   if (rpcId.region() == -1)
+   if (rpcId.region() == -1 && anaREm_)
+//   if (rpcId.region() == -1)
       {
         areaREm+=area;
         std::map<int, double>::iterator lb = pairLsRateREm.find(lumiblock);
@@ -479,7 +516,7 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
         }
       }//end endcap negative
 
-      if (rpcId.region() == 1)
+      if (rpcId.region() == 1 && anaREp_)
       {
         areaREp+=area;
         std::map<int, double>::iterator lb = pairLsRateREp.find(lumiblock);
@@ -527,6 +564,9 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 				rpcev_.BHits+=countRecHits;
         if(lb != pairLsRateB.end()) lb->second += countRecHits;
         else pairLsRateB.insert ( std::pair<int,double>(lumiblock,countRecHits));
+
+if(rpcId.ring() == myWheel_)		//per given wheel
+{
         if(rpcId.station() == 1)
         {
           if(rpcId.layer() == 1)
@@ -584,6 +624,11 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
           if(lb != pairLsRateRB4.end()) lb->second += countRecHits;
           else pairLsRateRB4.insert ( std::pair<int,double>(lumiblock,countRecHits));
         }//end RB4
+
+}
+
+if (anaW_)
+{
         if (abs(rpcId.ring()) == 2)
         {
           if (rpcId.ring() == 2)
@@ -630,6 +675,8 @@ RateVsLumi::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
             else pairLsRateWp1.insert ( std::pair<int,double>(lumiblock,countRecHits));
           }//W+1
         }
+}
+
       }//end barrel
   }//loop over rolls
 
