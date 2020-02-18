@@ -159,9 +159,17 @@ void TrackFinder::process(const edm::Event& iEvent,
   if (useCSC_)
     collector.extractPrimitives(CSCTag(), iEvent, tokenCSC_, muon_primitives);
   if (useRPC_ && useCPPF_)
+//FIXME
+  {
+    std::cout << "Echo from useCPPF TRUE" << std::endl;
     collector.extractPrimitives(CPPFTag(), iEvent, tokenCPPF_, muon_primitives);
+  }
   else if (useRPC_)
+//FIXME
+  {
+    std::cout << "Echo from useCPPF False" << std::endl;
     collector.extractPrimitives(RPCTag(), iEvent, tokenRPC_, muon_primitives);
+  }
   if (useGEM_)
     collector.extractPrimitives(GEMTag(), iEvent, tokenGEM_, muon_primitives);
 

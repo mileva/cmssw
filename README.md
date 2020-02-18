@@ -23,4 +23,10 @@ scram b -j 8
 
 cmsRun L1Trigger/L1TMuonCPPF/test/cppf_emulator_MC_modified.py
 
+18.02.2020 - working for MC, but stil not in the standard sequences
+
+cmsRun step2_DIGI_L1_DIGI2RAW_HLT.py
+
+
+
 
