@@ -21,11 +21,16 @@ git cms-merge-topic mileva:cppfClusterizerWithDigi
 
 scram b -j 8
 
-cmsRun L1Trigger/L1TMuonCPPF/test/cppf_emulator_MC_modified.py
+# local running only:   cmsRun L1Trigger/L1TMuonCPPF/test/cppf_emulator_MC_modified.py
 
 18.02.2020 - working for MC, but stil not in the standard sequences
 
-cmsRun step2_DIGI_L1_DIGI2RAW_HLT.py
+# configuration with cmsDriver.py generated file + additional lines to include the emulator
+cmsRun step2_DIGI_L1_DIGI2RAW_HLT_cppfEmulDigis.py
+
+# similar configuration is posible also with the standard release (no need of the above branch) using the rpc rechit producer to clusterize the cppf
+# please try this from separate cmssw project without mearing the above branch
+cmsRun step2_DIGI_L1_DIGI2RAW_HLT_cppfEmulRechits.py
 
 
 

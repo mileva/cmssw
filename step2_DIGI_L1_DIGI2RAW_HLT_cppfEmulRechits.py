@@ -32,7 +32,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:ZMM_13TeV_TuneCUETP8M1_cfi_GEN_SIM.root'),
+    fileNames = cms.untracked.vstring('file:/eos/cms/store/user/mileva/rpcUpgrade/cppfEmu/ZMM_13TeV_TuneCUETP8M1_cfi_GEN_SIM.root'),
     inputCommands = cms.untracked.vstring(
         'keep *', 
         'drop *_genParticles_*_*', 
@@ -83,6 +83,9 @@ process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.19 $')
 )
 
+process.load('RecoLocalMuon.RPCRecHit.rpcRecHits_cfi')
+from RecoLocalMuon.RPCRecHit.rpcRecHits_cfi import *
+
 process.load('L1Trigger.L1TMuonCPPF.emulatorCppfDigis_cfi')
 from L1Trigger.L1TMuonCPPF.emulatorCppfDigis_cfi import *
 
@@ -93,12 +96,22 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-DIGI-RAW-HLTDEBUG'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('step2_DIGI_L1_DIGI2RAW_HLT_testcppf.root'),
-    outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
+    fileName = cms.untracked.string('step2_DIGI_L1_DIGI2RAW_HLT_testCPPF_withRechits_EMTFdigi.root'),
+#    outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
+    outputCommands = cms.untracked.vstring("keep *"
+#                                         , "drop CastorDataFramesSorted_simCastorDigis_*_*"
+#                                         , "drop EBDigiCollection_simEcalUnsuppressedDigis_*_*"
+                                         , "drop *_mix_*_HLT*"
+
+),
     splitLevel = cms.untracked.int32(0)
 )
 
 # Additional output definition
+
+# Other statements
+process.rpcRecHits.rpcDigiLabel = 'simMuonRPCDigis'
+process.emulatorCppfDigis.recHitLabel = 'rpcRecHits'
 
 # Other statements
 process.mix.digitizers = cms.PSet(process.theDigitizersValid)
@@ -109,6 +122,8 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi_valid)
+
+process.rpcrechits_step = cms.Path(process.rpcRecHits)
 process.emulatorCppfDigis_step = cms.Path(process.emulatorCppfDigis)
 
 process.L1simulation_step = cms.Path(process.SimL1Emulator)
@@ -117,7 +132,8 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.digitisation_step,process.emulatorCppfDigis_step,process.L1simulation_step,process.digi2raw_step)
+#process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
+process.schedule = cms.Schedule(process.digitisation_step,process.rpcrechits_step,process.emulatorCppfDigis_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
